@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nabd Pharmacy</title>
+<meta name="description" content="Nabd (نبض) is a bilingual pharmacy shopping app for Android, built with React Native. Gesture-driven motion, full Arabic RTL, a 1,000-product grid and a VAT-correct cart.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pine: #0E3B35;
+    --pine-2: #15524A;
+    --lime: #C8F169;
+    --bg: #F4F6F3;
+    --surface: #FFFFFF;
+    --ink: #0B1F1C;
+    --muted: #4F625E;
+    --line: #DCE3DF;
+    --radius: 20px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1714; --surface: #10221E; --ink: #EAF1EE; --muted: #9DB1AB; --line: #1F3631;
+    }
+  }
+  :root[data-theme="dark"] { --bg: #0A1714; --surface: #10221E; --ink: #EAF1EE; --muted: #9DB1AB; --line: #1F3631; }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .ar { font-family: "IBM Plex Sans Arabic", sans-serif; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  /* Nav */
+  nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; text-decoration: none; letter-spacing: -0.01em; }
+  .brand img { width: 32px; height: 32px; border-radius: 9px; }
+  .brand .ar { font-weight: 600; color: var(--muted); font-size: 17px; }
+  nav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; font-size: 15px; font-weight: 500; }
+  nav ul a { text-decoration: none; color: var(--muted); }
+  nav ul a:hover { color: var(--ink); }
+  @media (max-width: 720px) { nav ul { display: none; } }
+
+  /* Hero */
+  .hero { background: var(--pine); color: #fff; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-top: 88px; padding-bottom: 88px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lime); }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lime); }
+  h1 { font-size: clamp(40px, 6vw, 68px); line-height: 1.02; letter-spacing: -0.03em; margin: 18px 0 20px; font-weight: 700; }
+  h1 em { font-style: normal; color: var(--lime); }
+  .lede { font-size: 19px; color: #C9DAD5; max-width: 34em; margin: 0 0 32px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform .12s ease, background-color .12s ease; }
+  .btn:active { transform: scale(0.97); }
+  .btn-lime { background: var(--lime); color: var(--pine); }
+  .btn-lime:hover { background: #D6F68A; }
+  .btn-ghost { border: 1.5px solid #3C6B63; color: #fff; }
+  .btn-ghost:hover { background: var(--pine-2); }
+  .hero-ar { margin-top: 28px; font-size: 18px; color: #9FC2B9; }
+
+  /* Phone */
+  .phone { justify-self: center; width: 300px; aspect-ratio: 9 / 19.5; border-radius: 44px; background: #061B18; padding: 12px; box-shadow: 0 0 0 1px #24534B inset; }
+  .screen { width: 100%; height: 100%; border-radius: 34px; background: #F4F6F3; overflow: hidden; display: flex; flex-direction: column; color: #0B1F1C; }
+  .s-head { background: var(--pine); padding: 30px 16px 14px; }
+  .s-hello { color: #C9DAD5; font-size: 12px; }
+  .s-title { color: #fff; font-weight: 700; font-size: 17px; margin: 2px 0 12px; }
+  .s-search { background: #fff; border-radius: 12px; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 12px; color: #6B7C78; font-size: 13px; }
+  .s-banner { margin: 14px 14px 0; height: 92px; border-radius: 16px; background: var(--lime); position: relative; padding: 14px; overflow: hidden; }
+  .s-banner b { display: block; color: var(--pine); font-size: 15px; }
+  .s-banner span { color: var(--pine); font-size: 11px; opacity: .8; }
+  .s-banner svg { position: absolute; right: -6px; bottom: -8px; width: 110px; opacity: .35; }
+  .s-dots { display: flex; gap: 5px; justify-content: center; margin: 9px 0 2px; }
+  .s-dots i { width: 6px; height: 6px; border-radius: 3px; background: #C2CCC8; }
+  .s-dots i:first-child { width: 16px; background: var(--pine); }
+  .s-chips { display: flex; gap: 8px; padding: 10px 14px; overflow: hidden; }
+  .s-chips span { flex: none; font-size: 11px; font-weight: 600; padding: 6px 11px; border-radius: 999px; background: #fff; border: 1px solid #DCE3DF; }
+  .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 14px; flex: 1; }
+  .s-card { background: #fff; border-radius: 14px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .s-img { aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; }
+  .s-name { font-size: 10.5px; font-weight: 600; line-height: 1.25; }
+  .s-price { font-size: 11px; font-weight: 700; color: var(--pine); }
+  .s-tabs { display: flex; justify-content: space-around; padding: 10px 6px 16px; background: #fff; border-top: 1px solid #E5EBE8; font-size: 9.5px; color: #6B7C78; }
+  .s-tabs div { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
+  .s-tabs div.on { color: var(--pine); font-weight: 700; }
+  .s-tabs svg { width: 18px; height: 18px; }
+  .badge { position: absolute; top: -5px; right: -8px; background: var(--lime); color: var(--pine); font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; border-radius: 8px; display: grid; place-items: center; animation: bump 3.2s ease-in-out infinite; }
+  @keyframes bump { 0%, 82%, 100% { transform: scale(1); } 88% { transform: scale(1.35); } 94% { transform: scale(0.92); } }
+
+  @media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; padding-top: 56px; padding-bottom: 64px; } .phone { width: 260px; } }
+
+  /* Sections */
+  section { padding: 96px 0; }
+  .kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  h2 { font-size: clamp(30px, 4vw, 44px); line-height: 1.08; letter-spacing: -0.025em; margin: 0 0 16px; max-width: 18em; }
+  .sub { color: var(--muted); max-width: 40em; margin: 0 0 48px; font-size: 18px; }
+
+  .screens { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .screen-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .screen-card .num { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .screen-card h3 { margin: 10px 0 12px; font-size: 22px; letter-spacing: -0.01em; }
+  .screen-card ul { margin: 0; padding: 0 0 0 18px; color: var(--muted); font-size: 15px; }
+  .screen-card li { margin: 6px 0; }
+  @media (max-width: 960px) { .screens { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .screens { grid-template-columns: 1fr; } }
+
+  .motion { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .feat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 32px; }
+  .feat .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--pine); color: var(--lime); display: grid; place-items: center; margin-bottom: 16px; }
+  .feat .ic svg { width: 22px; height: 22px; }
+  .feat h3 { font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .feat p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  @media (max-width: 860px) { .feat { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .feat { grid-template-columns: 1fr; } }
+
+  /* RTL split */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .lang { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+  .lang .tag { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 14px; border-radius: 14px; background: var(--bg); }
+  .row .thumb { width: 56px; height: 56px; border-radius: 10px; flex: none; background-size: cover; background-position: center; }
+  .row .meta { flex: 1; min-width: 0; }
+  .row .meta b { display: block; font-size: 15px; }
+  .row .meta span { color: var(--muted); font-size: 14px; }
+  .row .swipe { font-size: 13px; color: var(--pine); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  :root[data-theme="dark"] .row .swipe { color: var(--lime); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .row .swipe { color: var(--lime); } }
+  .row .swipe svg { width: 16px; height: 16px; }
+  .lang[dir="rtl"] { font-family: "IBM Plex Sans Arabic", sans-serif; }
+  .lang[dir="rtl"] .swipe svg { transform: scaleX(-1); }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+
+  /* Cart math */
+  .cart { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .receipt { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; font-size: 16px; }
+  .receipt .line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  .receipt .line:last-child { border-bottom: 0; font-weight: 700; font-size: 19px; padding-top: 14px; }
+  .receipt .line span:last-child { font-family: "IBM Plex Mono", monospace; }
+  code.blk { display: block; background: var(--pine); color: #DDEBE6; border-radius: 14px; padding: 18px 20px; font-family: "IBM Plex Mono", monospace; font-size: 14.5px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+  code.blk .k { color: var(--lime); }
+  @media (max-width: 860px) { .cart { grid-template-columns: 1fr; } }
+
+  /* Stack */
+  .stack { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stack span { padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 15px; font-weight: 500; }
+
+  /* Run */
+  .run { background: var(--pine); color: #fff; border-radius: 28px; padding: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .run h2 { color: #fff; }
+  .run p { color: #C9DAD5; margin: 0; }
+  .run code.blk { background: #061B18; }
+  @media (max-width: 860px) { .run { grid-template-columns: 1fr; padding: 32px 24px; } }
+
+  footer { padding: 40px 0 56px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; }
+
+  @media (max-width: 480px) { .wrap { padding: 0 16px; } section { padding: 64px 0; } }
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="32" height="32">Nabd <span class="ar" lang="ar">نبض</span></a>
+    <ul>
+      <li><a href="#screens">Screens</a></li>
+      <li><a href="#motion">Motion</a></li>
+      <li><a href="#rtl">Arabic</a></li>
+      <li><a href="#cart">Cart</a></li>
+      <li><a href="#run">Run it</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">React Native · Android first</span>
+      <h1>A pharmacy app that <em>moves</em> like it was built to.</h1>
+      <p class="lede">Nabd is a bilingual pharmacy shop: vitamins, skincare, baby care and medicines in a 1,000-product catalogue. Every gesture tracks the finger on the UI thread, and switching to Arabic flips the whole app, swipes and transitions included.</p>
+      <div class="cta">
+        <a class="btn btn-lime" href="#run">Run it locally</a>
+        <a class="btn btn-ghost" href="#motion">How it moves</a>
+      </div>
+      <p class="hero-ar ar" lang="ar" dir="rtl">صيدلية بلغتين، تتحرك بسلاسة، من اليمين إلى اليسار بالكامل.</p>
+    </div>
+
+    <div class="phone" aria-label="Illustration of the Nabd home screen" role="img">
+      <div class="screen">
+        <div class="s-head">
+          <div class="s-hello">Good evening</div>
+          <div class="s-title">What do you need today?</div>
+          <div class="s-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            Search vitamins, brands…
+          </div>
+        </div>
+        <div class="s-banner">
+          <b>Winter immunity</b>
+          <span>Vitamin C, zinc and D3</span>
+          <svg viewBox="0 0 100 100" fill="none"><path d="M21 53 L35 53 L41 43 L47 69 L56 29 L63 59 L67 53 L79 53" stroke="#0E3B35" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="s-dots"><i></i><i></i><i></i><i></i></div>
+        <div class="s-chips"><span>Vitamins</span><span>Skincare</span><span>Baby care</span><span>Hair care</span></div>
+        <div class="s-grid">
+          <div class="s-card"><div class="s-img" style="background-image:url('https://picsum.photos/seed/p-0007-1/200/200')"></div><div class="s-name">Vitamin D3 1000 IU</div><div class="s-price">SAR 39.00</div></div>
+          <div class="s-card"><div class="s-img" style="background-image:url('https://picsum.photos/seed/p-0042-1/200/200')"></div><div class="s-name">Hydrating Cleanser</div><div class="s-price">SAR 54.50</div></div>
+        </div>
+        <div class="s-tabs">
+          <div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Shop</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="badge">3</span>Cart</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="screens">
+    <div class="wrap">
+      <p class="kicker">The app</p>
+      <h2>Four shopping screens, plus search and an account.</h2>
+      <p class="sub">Every screen has designed loading, empty and error states, a reduced-motion variant and labels for TalkBack.</p>
+      <div class="screens">
+        <article class="screen-card">
+          <span class="num">01</span><h3>Home</h3>
+          <ul><li>Search header that collapses into a compact bar as you scroll</li><li>Auto-playing banner carousel that pauses while touched</li><li>Category and best-seller rails</li></ul>
+        </article>
+        <article class="screen-card">
+          <span class="num">02</span><h3>Category</h3>
+          <ul><li>Two-column grid of 1,000 products on FlashList v2</li><li>Images fade in once from a colour placeholder, no flicker on the way back</li><li>Filter and sort sheet that follows the finger and snaps</li></ul>
+        </article>
+        <article class="screen-card">
+          <span class="num">03</span><h3>Product</h3>
+          <ul><li>Shared-element transition: the tile image grows into the gallery</li><li>Swipeable gallery with a page indicator</li><li>Add to cart that bumps the badge, and a synced favourite heart</li></ul>
+        </article>
+        <article class="screen-card">
+          <span class="num">04</span><h3>Cart</h3>
+          <ul><li>Items animate in and out; the list closes the gap</li><li>Swipe to delete, with undo</li><li>Quantity stepper, 15% VAT line, total in SAR, checkout</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="motion" id="motion">
+    <div class="wrap">
+      <p class="kicker">Motion</p>
+      <h2>Gestures live on the UI thread. React only hears the result.</h2>
+      <p class="sub">Animations are driven by Reanimated shared values and worklets, never by per-frame React state. A busy JS thread can't make a swipe stutter.</p>
+      <div class="feat">
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
+          <h3>Tracks the finger</h3>
+          <p>The bottom sheet, swipe-to-delete and swipe-back follow your touch 1:1 and settle with springs that carry your release velocity.</p>
+        </div>
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></div>
+          <h3>Interruptible</h3>
+          <p>Grab the product transition mid-flight and drag it back. Nothing has to finish before you can change your mind.</p>
+        </div>
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
+          <h3>Virtualised grid</h3>
+          <p>1,000 products with stable keys. Rows don't re-render when the cart count changes, and tiles request images at their display size.</p>
+        </div>
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3>Instant feedback</h3>
+          <p>Pressed states are drawn by the native button view, with haptics where they help, so a tap answers before any data arrives.</p>
+        </div>
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
+          <h3>Respects reduce motion</h3>
+          <p>With the system setting on, movement becomes cross-fades and state changes. Nothing important is lost.</p>
+        </div>
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div>
+          <h3>Dark mode</h3>
+          <p>Follows the system, with its own tuned surfaces rather than an inverted palette.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rtl">
+    <div class="wrap">
+      <p class="kicker">Arabic</p>
+      <h2>One toggle flips everything, including which way you swipe.</h2>
+      <p class="sub">Layout uses logical start and end, never left and right. Gesture and transition maths multiply by the reading direction, so swipe-to-delete and swipe-back mirror too.</p>
+      <div class="split">
+        <div class="lang" dir="ltr" lang="en">
+          <span class="tag">English · LTR</span>
+          <div class="row">
+            <div class="thumb" style="background-image:url('https://picsum.photos/seed/p-0123-1/120/120')"></div>
+            <div class="meta"><b>Omega-3 Fish Oil</b><span>2 × SAR 48.00</span></div>
+            <div class="swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Swipe to remove</div>
+          </div>
+        </div>
+        <div class="lang" dir="rtl" lang="ar">
+          <span class="tag">العربية · من اليمين إلى اليسار</span>
+          <div class="row">
+            <div class="thumb" style="background-image:url('https://picsum.photos/seed/p-0123-1/120/120')"></div>
+            <div class="meta"><b>زيت السمك أوميغا ٣</b><span>٢ × ٤٨٫٠٠ ر.س</span></div>
+            <div class="swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>اسحب للحذف</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="motion" id="cart">
+    <div class="wrap cart">
+      <div>
+        <p class="kicker">Cart</p>
+        <h2>Money in integer halalas. VAT shown as its own line.</h2>
+        <p class="sub" style="margin-bottom:24px">Saudi shelf prices include 15% VAT, so the cart works backwards from the gross. All maths is integers, rounded once, with unit tests for quantities, totals and VAT.</p>
+        <code class="blk"><span class="k">vat</span>   = floor((6 × gross + 23) / 46)
+<span class="k">net</span>   = gross − vat
+<span class="k">total</span> = gross</code>
+      </div>
+      <div class="receipt" aria-label="Example cart totals">
+        <div class="line"><span>Omega-3 Fish Oil × 2</span><span>96.00</span></div>
+        <div class="line"><span>Vitamin D3 1000 IU × 1</span><span>39.00</span></div>
+        <div class="line"><span>Subtotal (excl. VAT)</span><span>117.39</span></div>
+        <div class="line"><span>VAT 15%</span><span>17.61</span></div>
+        <div class="line"><span>Total</span><span>SAR 135.00</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="wrap">
+      <p class="kicker">Built with</p>
+      <h2>A production React Native stack.</h2>
+      <p class="sub">Runs with no setup on a deterministic fake backend (1,000 products from a fixed seed, pages of 20, simulated latency and failures). Add Supabase keys for accounts, synced favourites and real orders, secured by Row Level Security.</p>
+      <div class="stack">
+        <span>Expo SDK 58</span><span>React Native 0.88 · New Architecture</span><span>Hermes</span><span>React Compiler</span><span>Reanimated 4</span><span>Gesture Handler 3</span><span>FlashList v2</span><span>expo-image</span><span>Expo Router</span><span>zustand</span><span>TanStack Query</span><span>MMKV</span><span>Supabase</span><span>TypeScript strict</span><span>Jest</span><span>Maestro</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="run" style="padding-top:0">
+    <div class="wrap">
+      <div class="run">
+        <div>
+          <h2>Run it in three commands.</h2>
+          <p>No keys needed: the fake backend starts by default. For Supabase, put the project URL and anon key in <span class="mono">.env</span> as <span class="mono">EXPO_PUBLIC_SUPABASE_URL</span> and <span class="mono">EXPO_PUBLIC_SUPABASE_ANON_KEY</span>.</p>
+        </div>
+        <code class="blk"><span class="k">git</span> clone &lt;repo&gt; nabd && cd nabd
+<span class="k">npm</span> install
+<span class="k">npx</span> expo start</code>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="28" height="28">Nabd</a>
+    <span>A portfolio project. Product names and images are placeholders. Not a real pharmacy.</span>
+  </div>
+</footer>
+
+</body>
+</html>
