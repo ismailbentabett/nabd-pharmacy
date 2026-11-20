@@ -10,6 +10,7 @@ import {
   createFavorites,
   EMPTY_FAVORITES,
   favoriteActions,
+  FAVORITES_OWNER_KEY,
   FAVORITES_STORAGE_KEY,
   favoritesFromIds,
   getFavoritesState,
@@ -111,6 +112,59 @@ describe('favourites store', () => {
     actions.clear();
     expect(useFavorites.getState()).toBe(EMPTY_FAVORITES);
     expect(remote.removed).toEqual([]);
+  });
+});
+
+describe('favourites owner (claimFor)', () => {
+  /** A device that restarts with `ids` saved for `owner` ('' = nobody, undefined = never set). */
+  function restart(ids: string[], owner?: string) {
+    const storage = memoryStorage(JSON.stringify(ids));
+    if (owner !== undefined) storage.map.set(FAVORITES_OWNER_KEY, owner);
+    return { storage, ...createFavorites(storage) };
+  }
+
+  it('cold start with a list saved for user A, now signed out: wipes it', () => {
+    const { storage, useFavorites, actions } = restart([A, B], 'user-a');
+    actions.claimFor(null);
+    expect(useFavorites.getState()).toBe(EMPTY_FAVORITES);
+    expect(storage.map.get(FAVORITES_STORAGE_KEY)).toBe('[]');
+    expect(storage.map.get(FAVORITES_OWNER_KEY)).toBe('');
+  });
+
+  it('user A to user B: wipes A’s list and records B', () => {
+    const { storage, useFavorites, actions } = restart([A], 'user-a');
+    const remote = spyRemote();
+    actions.setRemote(remote);
+    actions.claimFor('user-b');
+    expect(useFavorites.getState()).toBe(EMPTY_FAVORITES);
+    expect(storage.map.get(FAVORITES_OWNER_KEY)).toBe('user-b');
+    expect(remote.removed).toEqual([]); // A's server copy is untouched
+  });
+
+  it('signed-out hearts are kept on sign-in, then merged into the account', () => {
+    for (const owner of [undefined, '']) {
+      const { storage, useFavorites, actions } = restart([A], owner);
+      actions.claimFor('user-a');
+      expect(useFavorites.getState().ids).toEqual([A]);
+      expect(storage.map.get(FAVORITES_OWNER_KEY)).toBe('user-a');
+      const remote = spyRemote();
+      actions.setRemote(remote);
+      actions.mergeServer([B]);
+      expect(useFavorites.getState().ids).toEqual([A, B]);
+      expect(remote.added).toEqual([A]);
+    }
+  });
+
+  it('the same user after a restart keeps the list', () => {
+    const { useFavorites, actions } = restart([A, B], 'user-a');
+    actions.claimFor('user-a');
+    expect(useFavorites.getState().ids).toEqual([A, B]);
+  });
+
+  it('signed out with a signed-out list keeps it', () => {
+    const { useFavorites, actions } = restart([A], '');
+    actions.claimFor(null);
+    expect(useFavorites.getState().ids).toEqual([A]);
   });
 });
 

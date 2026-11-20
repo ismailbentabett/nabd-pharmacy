@@ -51,7 +51,7 @@ Candidates: `ANDROID_SYNCHRONOUSLY_UPDATE_UI_PROPS`, `USE_COMMIT_HOOK_ONLY_FOR_R
 ## ADR-013 React Compiler on — *Accepted*
 Default in SDK 54+; keep lint rules; do not add manual `useMemo/useCallback` unless profiler shows need (explain in walkthrough: compiler memoises; shared values are stable refs).
 
-## ADR-014 Favourite heart is NOT on `main` — *Accepted*
+## ADR-014 Favourite heart is NOT on `main` — *Superseded by ADR-058 (the heart ships)*
 The follow-up's live change. `main` leaves a clean seam (per-id selector store pattern, `PriceBlock`/`ProductTile` composition slot). Rehearsal lives on branch `rehearsal/favourite-heart` + `_prep/LIVE_SESSION_PREP.md`. Never ship it unannounced; mention the seam in README "what's next".
 
 ## ADR-015 Undo-on-stepper-minus behaviour — *Accepted*
@@ -400,3 +400,68 @@ The Arabic hint copy (`lang.toggleHint`) needs a native speaker's read; that is 
 **Consequences.** No motion, layout or data code changed; typecheck and the full Jest suite passed unchanged after the rename. The pulse line is not mirrored in Arabic (a logo is not text).
 
 **Verify-by.** `node scripts/contrast.mjs --tokens` exits 0; `python scripts/brand/make-icons.py` regenerates identical icons; `grep -ri "navy\|gold" src app` finds no token names.
+
+## ADR-056 — Accounts: optional Supabase, email one-time code, one session store — *Accepted*
+
+**Context.** A portfolio app needs to show a real backend, but a fresh clone must still run with no keys and no account.
+
+**Decision.**
+- **Supabase is optional.** `getSupabase()` (`src/core/supabase/client.ts`) returns `null` when the build has no keys. Every service picks its implementation once at import: the catalog (`api.kind`) and orders (`ordersApi.kind`) are `'fake'` or `'supabase'`. Screens never branch on the backend; the Account footer names it so a demo is honest about where data came from.
+- **Sign-in is an emailed 6-digit code** (Supabase email OTP). No passwords to store, reset or leak, and the same screen covers sign-up and sign-in.
+- **One small session store** (`src/state/session.store.ts`) with four statuses: `offline` (no keys), `loading` (stored session being read), `signedOut`, `signedIn`. `src/features/account/auth.ts` is its only writer; everything else reads through a selector.
+- `applySession` acts only when the user id changes, so a token refresh does nothing. Database work triggered by an auth event is deferred one tick, because supabase-js holds a lock while it notifies.
+- Signing out removes the favourites remote and wipes the local favourites, so the next person on the phone does not see them.
+
+**Security.** Only the anon key ships. Row Level Security (`supabase/migrations/20261120000200_rls.sql`) is the boundary: catalog read-only for all, profiles/favourites/orders per user, order writes only through `place_order` (ADR-057).
+
+**Verify-by.** `tests/accountScreen.test.tsx` covers the four views; with no keys the app boots to `offline` and every tab works.
+
+## ADR-057 — Checkout through a server-priced `place_order` RPC; offline orders stay on the device — *Accepted*
+
+**Context.** Checkout and payments were out of scope for the brief. The portfolio version adds ordering (still no payment) and must not let a client set its own prices.
+
+**Decision.**
+- **The server prices the order.** The client sends product ids and quantities only. `public.place_order` (`supabase/migrations/20261120000300_place_order.sql`) reads `products.price_h`, checks stock, computes VAT and writes the order and its lines in one transaction. Users cannot insert into `orders` directly (RLS).
+- **Same money rules on both sides.** Integer halalas; VAT is the 15% share of a VAT-inclusive price, `floor((6*gross+23)/46)` in SQL and `splitVat` in TypeScript, so the order total always equals the cart total.
+- **Typed failures.** Errors become a `CheckoutError` kind (signed out, out of stock, empty, network…), so the UI picks copy from the kind, never from a server string.
+- **Offline policy.** A build without keys can still place orders. They go to an in-memory fake (`offline-000001`…), vanish when the app closes, and the cart says so under the button. The whole cart → order → history flow is demoable on a fresh clone, and a fake order can never reach a server.
+- **History** reads `['orders', userId ?? 'offline']`, so a second account on the same phone never sees the first one's cached orders; checkout invalidates the `['orders']` prefix.
+- **F-03 holds.** The press gets the pressed state and a haptic at once and the label changes in the same render, before any network work.
+
+**Verify-by.** `tests/ordersApi.test.ts`, `tests/checkout.test.tsx`, `tests/ordersSection.test.tsx`.
+
+## ADR-058 — Favourites ship: one local-first store, mirrored when signed in — *Accepted (supersedes ADR-014)*
+
+**Context.** ADR-014 kept the heart off `main` as the live-change exercise. For the portfolio version the feature ships.
+
+**Decision.**
+- A zustand store of ids (newest first) persisted to MMKV, the same shape as the cart store (`src/state/favorites.store.ts`).
+- Tiles subscribe with `useIsFavorite(id)`, a boolean selector: a toggle re-renders that tile and the product page for that id, never the other 999 tiles (F-05). One store is also why the grid and product hearts cannot disagree.
+- The pop animation runs on the UI thread on the off → on change only; with reduce motion it becomes an opacity dip.
+- Signed in, each toggle is mirrored to `public.favorites`. The local store stays the UI's source of truth: the heart flips on the tap, the network follows, and a failed write is logged, not rolled back in the user's face. On sign-in the server list is merged in and missing ids are pushed up.
+
+**Trade-off.** Two devices toggling the same id offline can disagree until the next sign-in merge. Acceptable for favourites, not for anything with money.
+
+## ADR-059 — Search: one ranking, implemented twice — *Accepted*
+
+**Decision.**
+- A pushed `app/search.tsx` screen (not a tab), opened from Home's search field, focused on arrival.
+- Bilingual matching: lower-case, drop Arabic diacritics and tatweel, fold alef/yaa/taa-marbuta variants, collapse punctuation. Every term must match; a term at a word start scores 2, inside a word 1; ties by reviews then id.
+- The same steps run in TypeScript (`src/core/catalog/search.ts`, offline backend) and SQL (`public.normalize_search` + `public.search_products`), so both backends return the same results for the same query.
+- Typing is debounced; each query is cached by TanStack Query, and previous results stay visible while the next loads (no skeleton flash between keystrokes). Idle, loading, empty, error-with-retry and results each have their own view.
+- A plain `FlatList`: results are capped, so virtualisation tuning buys nothing. Rows are hero sources, like Category tiles.
+- No trigram index: 1,000 rows scan in well under the request budget. Add `pg_trgm` past roughly 50k rows.
+
+## ADR-060 — Checkout is idempotent and removes only what was ordered; local data belongs to one account — *Accepted (amends ADR-057, ADR-058)*
+
+**Context.** A hostile review of ADR-057/058 found four real defects. (1) A successful order called `clear()`, which also dropped anything added to the cart while the request was in flight. (2) A timeout whose request did reach the server, followed by a retry, wrote the order twice. (3) Favourites saved on the phone survived sign-out, so the next account on the device merged the previous person's list into its own. (4) The offline build hid the order history and favourites behind the "no backend" message, although both work there.
+
+**Decision.**
+- **Partial removal.** On success the cart runs `removeOrdered(lines)` with the exact lines that were sent: it subtracts those quantities, drops lines that reach zero, and creates no undo. Extra units and items added mid-request stay.
+- **One request id per attempt.** `placeOrder(lines, requestId)`. The id is a client uuid kept for the same cart lines and reused on retry; a changed cart or a successful order starts a new one. `orders.request_id` has a unique index on `(user_id, request_id)`. `place_order` returns the existing order for a repeated id before validating anything (so a retry gets the same answer even if stock moved), and two simultaneous identical requests are settled by `on conflict do nothing` and a re-read. The fake backend dedupes the same way. Migration: `supabase/migrations/20261120000500_order_idempotency.sql`.
+- **Stricter qty.** Each `qty` must be a JSON number, whole, 1–99, checked before any cast: `"2"`, `true` and `1.5` are `BAD_QTY`, not coerced.
+- **Expired session.** A `signedOut` checkout error also signs out locally, so the Account tab shows the form instead of a stale "signed in".
+- **Favourites have an owner.** MMKV keeps `favorites.owner.v1` next to the list. On sign-out the list is wiped; on sign-in as a different user it is wiped before the server merge. A list owned by nobody (made signed out, or offline) is kept and merged into the account that signs in, as ADR-058 intended. On sign-out or a user change the cached `['orders']` queries are removed, not just invalidated.
+- **Offline Account tab** shows favourites and the in-memory order history under the "no backend" notice.
+
+**Verify-by.** `tests/cart.test.ts` (`removeOrdered`), `tests/cartStore.test.tsx`, `tests/checkout.test.tsx` (mid-request add survives; same id on retry; new id on a changed cart; sign-out on `signedOut`), `tests/ordersApi.test.ts` (rpc gets `request_id`; fake dedupe), `tests/favorites.test.tsx` (owner wipe/keep), `tests/accountScreen.test.tsx` (offline view, `applySession` owner cases). The SQL migration has **not been run** against a database yet (no Postgres on the build machine); it is checked by review only.

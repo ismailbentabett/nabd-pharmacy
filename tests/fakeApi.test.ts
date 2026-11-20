@@ -59,6 +59,7 @@ describe('filters and sort', () => {
     const api = instant();
     const { ids, total } = await allPages(api, { category: 'skincare' });
     expect(total).toBe(125);
+    expect(ids).toHaveLength(125); // also keeps the .every below from passing on an empty list
     const byId = getCatalog().byId;
     expect(ids.every((id) => byId.get(id)?.category === 'skincare')).toBe(true);
   });

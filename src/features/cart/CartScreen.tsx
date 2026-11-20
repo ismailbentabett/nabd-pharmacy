@@ -15,9 +15,13 @@
  * Motion (K-01): deleting the last line fades the list and the totals card out, then the empty state
  * rises in once they are gone (enterAfterExit), so the two never overlap. Undo brings the totals card
  * back with the same entrance as the rows. The undo bar names the product it removed.
+ *
+ * After "Place order" succeeds the cart empties, so the confirmation (`CheckoutSuccess`) sits on top
+ * of the empty state until it is dismissed or something new is added.
  */
 import { useRouter } from 'expo-router';
 import { ShoppingBag } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,6 +34,7 @@ import { useT } from '@/i18n/useT';
 import { haptics } from '@/motion/haptics';
 import { useMotionPreference } from '@/motion/motionPreference';
 import { cartActions, useCartCount, useCartIds, useLastRemoved } from '@/state/cart.store';
+import { setLastPlacedOrder } from '@/state/orders';
 import { testIds } from '@/testIds';
 import { EmptyState } from '@/ui/EmptyState';
 import { UndoBar } from '@/ui/UndoBar';
@@ -38,6 +43,7 @@ import { onFirstScreenLayout } from '@/ui/LaunchVeil';
 import { CartList } from './CartList';
 import { enterAfterExit, enterNow, exitCollapse, reducedEnter, reducedEnterAfterExit, reducedExit } from './cartMotion';
 import { CartSummary } from './CartSummary';
+import { CheckoutSuccess } from './CheckoutSuccess';
 
 function CartHeader() {
   const styles = useStyles();
@@ -78,6 +84,12 @@ export function CartScreen() {
     ? t('cart.removedItem', { name: lang === 'ar' ? removed.nameAr : removed.name })
     : t('cart.removed');
   const exiting = reduceMotion ? reducedExit : exitCollapse;
+  const hasLines = ids.length > 0;
+
+  // An order confirmation belongs to the cart it emptied: once something new is added, it is stale.
+  useEffect(() => {
+    if (hasLines) setLastPlacedOrder(null);
+  }, [hasLines]);
 
   const undo = () => {
     haptics.tap();
@@ -98,6 +110,7 @@ export function CartScreen() {
             style={styles.centre}
             entering={reduceMotion ? reducedEnterAfterExit : enterAfterExit}
           >
+            <CheckoutSuccess />
             <EmptyState
               icon={ShoppingBag}
               title={t('cart.empty.title')}

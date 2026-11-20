@@ -1,5 +1,5 @@
 /**
- * The three tabs (G-01) with our own tab bar. `lazy` mounts a tab the first time it is opened and
+ * The four tabs (Home, Category, Cart, Account) with our own tab bar. `lazy` mounts a tab the first time it is opened and
  * then keeps it mounted, so the Category grid keeps its scroll position and filters when the user
  * switches tabs and comes back.
  */
@@ -15,6 +15,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="category" />
       <Tabs.Screen name="cart" />
+      <Tabs.Screen name="account" />
     </Tabs>
   );
 }

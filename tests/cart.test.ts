@@ -211,6 +211,73 @@ describe('5. remove and undo', () => {
   });
 });
 
+describe('5b. removeOrdered (after a successful checkout)', () => {
+  // The order took 1 × a and 3 × b; meanwhile the cart may have changed.
+  const ordered = [
+    { productId: 'a', qty: 1 },
+    { productId: 'b', qty: 3 },
+  ];
+  const start = run([
+    { type: 'add', id: 'a' },
+    { type: 'add', id: 'b', qty: 3 },
+  ]);
+
+  it('empties the cart when nothing changed during the order, without offering undo', () => {
+    const state = cartReducer(start, { type: 'removeOrdered', lines: ordered });
+    expect(state.ids).toEqual([]);
+    expect(state.byId).toEqual({});
+    expect(state.lastRemoved).toBeNull();
+  });
+
+  it('keeps extra units and new lines added while the order was in flight', () => {
+    const during = run(
+      [
+        { type: 'add', id: 'b', qty: 2 },
+        { type: 'add', id: 'c' },
+      ],
+      start,
+    );
+    const state = cartReducer(during, { type: 'removeOrdered', lines: ordered });
+    expect(state.ids).toEqual(['b', 'c']);
+    expect(selectLine(state, 'b')?.qty).toBe(2);
+    expect(selectLine(state, 'c')?.qty).toBe(1);
+    expect(state.lastRemoved).toBeNull();
+  });
+
+  it('a line lowered or removed meanwhile is simply gone, never negative', () => {
+    const during = run(
+      [
+        { type: 'setQty', id: 'b', qty: 1 },
+        { type: 'remove', id: 'a' },
+        { type: 'commitRemoval' },
+      ],
+      start,
+    );
+    const state = cartReducer(during, { type: 'removeOrdered', lines: ordered });
+    expect(state.ids).toEqual([]);
+  });
+
+  it('keeps a pending undo for a product that was not ordered, drops one for a product that was', () => {
+    const withC = run([{ type: 'add', id: 'c' }], start);
+    const cRemoved = cartReducer(withC, { type: 'remove', id: 'c' });
+    expect(cartReducer(cRemoved, { type: 'removeOrdered', lines: ordered }).lastRemoved?.line.id).toBe('c');
+
+    // `a` removed by hand while its order was in flight: undo must not put a bought line back.
+    const aRemoved = cartReducer(start, { type: 'remove', id: 'a' });
+    expect(cartReducer(aRemoved, { type: 'removeOrdered', lines: ordered }).lastRemoved).toBeNull();
+  });
+
+  it('keeps the ids array when only quantities drop, and the same state when nothing matches', () => {
+    const during = run([{ type: 'add', id: 'a', qty: 4 }, { type: 'add', id: 'b' }], start);
+    const state = cartReducer(during, { type: 'removeOrdered', lines: ordered });
+    expect(state.ids).toBe(during.ids);
+    expect([selectLine(state, 'a')?.qty, selectLine(state, 'b')?.qty]).toEqual([4, 1]);
+
+    expect(cartReducer(start, { type: 'removeOrdered', lines: [{ productId: 'zzz', qty: 1 }] })).toBe(start);
+    expect(cartReducer(start, { type: 'removeOrdered', lines: [] })).toBe(start);
+  });
+});
+
 describe('6. selectors', () => {
   it('selectCount sums units, not lines', () => {
     const state = run([

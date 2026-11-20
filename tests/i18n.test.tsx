@@ -73,8 +73,9 @@ describe('copy parity (en ↔ ar)', () => {
   });
 
   it('has Arabic text in every Arabic string (nothing left untranslated)', () => {
-    // The language toggle names its target language in that language's own script.
-    const latinByDesign = new Set(['lang.toggle']);
+    // The language toggle names its target language in that language's own script, and an
+    // email placeholder is an address, which is Latin in either language.
+    const latinByDesign = new Set(['lang.toggle', 'account.email.placeholder']);
     const untranslated = Object.entries(messages.ar).filter(
       ([key, s]) => !latinByDesign.has(key) && !ARABIC_LETTER.test(s),
     );

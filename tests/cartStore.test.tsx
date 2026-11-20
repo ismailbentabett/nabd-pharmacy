@@ -93,6 +93,21 @@ describe('createCart', () => {
     unsubscribe();
   });
 
+  it('removeOrdered subtracts an order, saves the rest, and offers no undo', () => {
+    const storage = memoryStorage();
+    const { useCart, actions } = createCart(storage);
+    actions.add(A, 2);
+    actions.add(B);
+    actions.removeOrdered([
+      { productId: A, qty: 1 },
+      { productId: B, qty: 1 },
+    ]);
+    expect(useCart.getState().ids).toEqual([A]);
+    expect(useCart.getState().byId[A]?.qty).toBe(1);
+    expect(useCart.getState().lastRemoved).toBeNull();
+    expect(createCart(memoryStorage(storage.value())).useCart.getState().ids).toEqual([A]);
+  });
+
   it('writes nothing when only the undo slot changes', () => {
     const storage = memoryStorage();
     const { actions } = createCart(storage);

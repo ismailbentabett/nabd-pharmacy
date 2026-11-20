@@ -8,6 +8,9 @@
  * - Signed in to Supabase, every toggle is also mirrored to `public.favorites` through `remote`.
  *   The local store stays the source of truth for the UI: the heart flips on the tap, the network
  *   call follows, and a failed call is logged by the remote, not rolled back in the user's face.
+ * - The list has an owner, saved next to it: the user id it belongs to, or nobody (favourites added
+ *   while signed out). `claimFor` wipes a list owned by someone else, so user A's hearts never
+ *   survive into a signed-out phone or into user B's account, even across an app restart.
  */
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { createMMKV } from 'react-native-mmkv';
@@ -35,6 +38,8 @@ export interface FavoritesRemote {
 }
 
 export const FAVORITES_STORAGE_KEY = 'favorites.v1';
+/** Who the saved list belongs to: a user id, or '' for nobody (signed out). */
+export const FAVORITES_OWNER_KEY = 'favorites.owner.v1';
 
 /** Build a state from ids, dropping duplicates and ids the catalog does not know. */
 export function favoritesFromIds(ids: readonly unknown[]): FavoritesState {
@@ -89,6 +94,11 @@ export interface FavoriteActions {
   mergeServer(serverIds: readonly string[]): void;
   setRemote(remote: FavoritesRemote | null): void;
   clear(): void;
+  /**
+   * Make `userId` (null = signed out) the owner of the list. A list owned by another user is wiped
+   * first. A list owned by nobody is kept, so hearts added before signing in join the account.
+   */
+  claimFor(userId: string | null): void;
 }
 
 export interface Favorites {
@@ -133,6 +143,12 @@ export function createFavorites(storage: FavoritesStorage): Favorites {
     },
     clear() {
       useFavorites.setState(EMPTY_FAVORITES, true);
+    },
+    claimFor(userId) {
+      const owner = storage.getString(FAVORITES_OWNER_KEY) || null;
+      if (owner === userId) return;
+      if (owner !== null) actions.clear();
+      storage.set(FAVORITES_OWNER_KEY, userId ?? '');
     },
   };
 

@@ -1,5 +1,5 @@
 /**
- * The bottom tab bar (G-01): Home, Category, Cart. A custom bar for expo-router's JS tabs, so we own
+ * The bottom tab bar: Home, Category, Cart, Account. A custom bar for expo-router's JS tabs, so we own
  * its motion and its accessibility.
  *
  * The selected-tab pill slides between tabs on a spring, on the UI thread (F-02): `position` is a
@@ -18,7 +18,7 @@
  * re-renders the bar and its badge. No grid or list row subscribes to the count, so the grid never
  * re-renders for it (F-05).
  */
-import { House, LayoutGrid, ShoppingBag, type LucideIcon } from 'lucide-react-native';
+import { CircleUser, House, LayoutGrid, ShoppingBag, type LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -47,6 +47,7 @@ const TAB_META: Readonly<Record<TabRouteName, { icon: LucideIcon; label: Message
   index: { icon: House, label: 'tab.home' },
   category: { icon: LayoutGrid, label: 'tab.category' },
   cart: { icon: ShoppingBag, label: 'tab.cart' },
+  account: { icon: CircleUser, label: 'tab.account' },
 };
 
 const TAB_NAMES: ReadonlySet<string> = new Set(Object.keys(TAB_META));

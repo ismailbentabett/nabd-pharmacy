@@ -33,8 +33,8 @@ The AI wrote nearly all of the code, tests and docs in this repository, under th
   fixed what it found: the first request failing on every launch (ADR-048), and the web-only language, direction,
   accessibility-focus and Best sellers issues (ADR-049). Web is not the target platform; none of this replaces the
   phone check.
-- **Fonts on web and brand mark**: the AI made the web preview load IBM Plex (ADR-050), designed the capsule-and-plus
-  mark, wrote `scripts/brand/make-icons.py` that draws every launcher, splash and favicon bitmap, and the matching
+- **Fonts on web and brand mark**: the AI made the web preview load IBM Plex (ADR-050), designed the Nabd mark (a lime disc
+  carrying a pine pulse line, ADR-055), wrote `scripts/brand/make-icons.py` that draws every launcher, splash and favicon bitmap, and the matching
   `src/design/BrandMark.tsx` for the Home header (ADR-051). The author must check the launcher icon and splash on the phone.
 - **Launch veil and logo skeletons**: the AI wrote `src/ui/LaunchVeil.tsx` (the splash carried into React and lifted
   with motion when the first screen lays out) and the brand-mark watermark in image skeletons, with their tests (ADR-052). The
@@ -42,6 +42,19 @@ The AI wrote nearly all of the code, tests and docs in this repository, under th
 - **Dark mode**: the AI turned on the existing dark palette so the app follows the system scheme (ADR-053), checked
   all four screens, the filter sheet and the undo bar in dark on the web preview, and measured the dark text contrast.
   The author must check dark mode on the phone.
+
+## Nabd portfolio version (the rebrand and the backend)
+The take-home was rebranded into Nabd, a separate project, and extended. The AI did all of this under the
+author's request, with a separate hostile-review pass before commit:
+- **Rebrand** (ADR-055): name, palette, mark, icons and copy in both languages.
+- **Supabase backend** (ADR-056): the optional client, schema, Row Level Security policies, seed generator
+  (`scripts/supabase/make-seed.ts`) and migrations in `supabase/migrations/`. No Supabase project was created by the
+  AI; the author creates one and runs the migrations.
+- **Accounts** (ADR-056): email one-time-code sign-in, the session store and the Account tab.
+- **Checkout and order history** (ADR-057): the server-priced `place_order` function and the offline in-memory orders.
+- **Favourites** (ADR-058) and **search** (ADR-059), with their SQL mirrors.
+- The author must run the migrations against a real Supabase project, sign in with a real email on the phone,
+  place an order and check that it appears in the dashboard before claiming any of this works end to end.
 
 ## What the author decided
 - The brief, the stack and the hard rules in `CLAUDE.md` (no per-frame React state, UI-thread animation,

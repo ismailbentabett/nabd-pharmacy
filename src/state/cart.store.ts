@@ -24,6 +24,7 @@ import {
   type CartAction,
   type CartLine,
   type CartState,
+  type OrderedLine,
   type RemovedLine,
 } from './cartMath';
 
@@ -81,6 +82,8 @@ export interface CartActions {
   undo(): void;
   commitRemoval(): void;
   clear(): void;
+  /** Subtract a placed order's lines; what was added meanwhile stays. */
+  removeOrdered(lines: readonly OrderedLine[]): void;
 }
 
 export interface Cart {
@@ -114,6 +117,7 @@ export function createCart(storage: CartStorage): Cart {
       undo: () => dispatch({ type: 'undo' }),
       commitRemoval: () => dispatch({ type: 'commitRemoval' }),
       clear: () => dispatch({ type: 'clear' }),
+      removeOrdered: (lines) => dispatch({ type: 'removeOrdered', lines }),
     },
   };
 }

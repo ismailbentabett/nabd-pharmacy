@@ -26,6 +26,7 @@ import { useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { makeStyles, type Scheme, ThemeProvider } from '@/design/theme';
+import { AuthSync } from '@/features/account/auth';
 import { useAppFontsReady } from '@/design/useWebFonts';
 import { size } from '@/design/tokens';
 import { LocaleProvider, nativeLang } from '@/i18n/direction';
@@ -69,6 +70,7 @@ export default function RootLayout() {
           <LocaleProvider lang={nativeLang}>
             <LucideProvider strokeWidth={size.iconStroke}>
               <MotionPreferenceSync />
+              <AuthSync />
               {fontsReady ? (
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="(tabs)" />

@@ -11,6 +11,12 @@ export interface CartLine {
   qty: number;
 }
 
+/** A line as an order sent it: same shape as the orders API's `OrderLineInput`. */
+export interface OrderedLine {
+  productId: string;
+  qty: number;
+}
+
 export interface RemovedLine {
   line: CartLine;
   /** Position the line had, so undo puts it back exactly where it was. */
@@ -31,7 +37,8 @@ export type CartAction =
   | { type: 'remove'; id: string }
   | { type: 'undo' }
   | { type: 'commitRemoval' }
-  | { type: 'clear' };
+  | { type: 'clear' }
+  | { type: 'removeOrdered'; lines: readonly OrderedLine[] };
 
 export const EMPTY_CART: CartState = { ids: [], byId: {}, lastRemoved: null };
 
@@ -50,6 +57,30 @@ function removeLine(state: CartState, id: string): CartState {
     byId,
     lastRemoved: { line, index },
   };
+}
+
+/**
+ * After an order succeeds: take away exactly what it contained. Anything added while the order was in
+ * flight (a new line, or extra units of an ordered one) stays. A line that reaches 0 just goes; it is
+ * not a deletion, so it does not offer undo.
+ */
+function removeOrdered(state: CartState, lines: readonly OrderedLine[]): CartState {
+  let byId: Record<string, CartLine> | null = null;
+  for (const ordered of lines) {
+    const line = (byId ?? state.byId)[ordered.productId];
+    if (line === undefined || !(ordered.qty > 0)) continue;
+    byId ??= { ...state.byId };
+    const left = line.qty - ordered.qty;
+    if (left > 0) byId[line.id] = { id: line.id, qty: left };
+    else delete byId[line.id];
+  }
+  if (byId === null) return state;
+  const kept = byId;
+  const ids = state.ids.filter((id) => kept[id] !== undefined);
+  // A pending undo for a product that was just ordered would put a bought line back: drop it.
+  const removed = state.lastRemoved;
+  const lastRemoved = removed !== null && lines.some((l) => l.productId === removed.line.id) ? null : removed;
+  return { ids: ids.length === state.ids.length ? state.ids : ids, byId: kept, lastRemoved };
 }
 
 export function cartReducer(state: CartState, action: CartAction): CartState {
@@ -91,6 +122,8 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
       return state.lastRemoved === null ? state : { ...state, lastRemoved: null };
     case 'clear':
       return EMPTY_CART;
+    case 'removeOrdered':
+      return removeOrdered(state, action.lines);
   }
 }
 

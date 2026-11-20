@@ -11,6 +11,9 @@
  * The delivery bar fills with a translateX on the UI thread (no width animation). Its fill is drawn
  * full width and slid back towards the start by the part not yet earned; in Arabic it slides the other
  * way (`dir`). Under reduced motion it jumps to the new value.
+ *
+ * "Place order" closes the card (`CheckoutButton`); it does not read the total, so it does not
+ * re-render on a quantity change.
  */
 import { Truck } from 'lucide-react-native';
 import { useEffect } from 'react';
@@ -28,6 +31,7 @@ import { effectsSlow } from '@/motion/springs';
 import { useCartTotals } from '@/state/cart.store';
 import { testIds } from '@/testIds';
 
+import { CheckoutButton } from './CheckoutButton';
 import { freeDeliveryProgress } from './freeDelivery';
 
 const TRACK_HEIGHT = 4;
@@ -97,6 +101,7 @@ export function CartSummary() {
       <SummaryLine label={t('cart.vat')} value={formatSar(vat, lang)} testID={testIds.cartVat} />
       <View style={styles.rule} />
       <SummaryLine label={t('cart.total')} value={formatSar(gross, lang)} testID={testIds.cartTotal} strong />
+      <CheckoutButton />
     </View>
   );
 }
