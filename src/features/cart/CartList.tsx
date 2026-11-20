@@ -18,6 +18,7 @@
  * Reduced motion (G-09): rows cross-fade in and out (timingReducedFade) and the gap closes at once.
  */
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
 import { makeStyles } from '@/design/theme';
@@ -26,7 +27,9 @@ import { useMotionPreference } from '@/motion/motionPreference';
 import { STAGGER_MAX_ITEMS } from '@/motion/springs';
 import { UNDO_BAR_MAX_HEIGHT } from '@/ui/UndoBar';
 
-import { enterNow, exitCollapse, reducedEnter, reducedExit, springToNewFrame, STAGGERED_ENTERING } from './cartMotion';
+import { enterNow, exitCollapse, reducedEnter, reducedExit, springToNewFrame, STAGGERED_ENTERING, webEnter, webExit, webLayout } from './cartMotion';
+
+const WEB = Platform.OS === 'web';
 import { CartRow } from './CartRow';
 
 /**
@@ -45,6 +48,7 @@ export function CartList({ ids }: { ids: readonly string[] }) {
 
   const enteringFor = (index: number) => {
     if (reduceMotion) return reducedEnter;
+    if (WEB) return webEnter;
     if (!firstMount) return enterNow;
     return STAGGERED_ENTERING[Math.min(index, STAGGER_MAX_ITEMS - 1)] ?? enterNow;
   };
@@ -55,8 +59,8 @@ export function CartList({ ids }: { ids: readonly string[] }) {
         <Animated.View
           key={id}
           entering={enteringFor(index)}
-          exiting={reduceMotion ? reducedExit : exitCollapse}
-          layout={reduceMotion ? undefined : springToNewFrame}
+          exiting={reduceMotion ? reducedExit : WEB ? webExit : exitCollapse}
+          layout={reduceMotion ? undefined : WEB ? webLayout : springToNewFrame}
         >
           <CartRow id={id} openRowId={openRowId} />
         </Animated.View>

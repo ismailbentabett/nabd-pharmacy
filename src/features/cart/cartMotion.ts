@@ -10,6 +10,8 @@
  */
 import {
   FadeIn,
+  FadeInDown,
+  LinearTransition,
   FadeOut,
   ReduceMotion,
   withDelay,
@@ -84,3 +86,10 @@ export const reducedEnterAfterExit = FadeIn.duration(duration.reducedFade)
   .delay(duration.reducedFade)
   .reduceMotion(ReduceMotion.Never);
 export const reducedExit = FadeOut.duration(duration.reducedFade).reduceMotion(ReduceMotion.Never);
+
+// Web: Reanimated's web runtime only plays its predefined builders and skips custom worklet
+// animations (it logs "Couldn't load entering/exiting animation"), so a browser gets the nearest
+// predefined equivalents instead. Native keeps the hand-tuned versions above.
+export const webEnter = FadeInDown.duration(duration.exit);
+export const webExit = FadeOut.duration(duration.exit);
+export const webLayout = LinearTransition.duration(duration.exit);

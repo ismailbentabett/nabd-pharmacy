@@ -84,6 +84,14 @@ export function PressableScale({
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ ...accessibilityState, disabled }}
+      // The same facts as the modern props. RNGH's web button forces `accessibilityRole="button"` and
+      // react-native-web ignores `accessibilityState`, so without these a heart reads as a plain button
+      // with no on/off state in a browser. `role` and `aria-*` win over the legacy props on every platform.
+      role={accessibilityRole === 'imagebutton' ? 'button' : accessibilityRole}
+      aria-checked={accessibilityState?.checked}
+      aria-selected={accessibilityState?.selected}
+      aria-expanded={accessibilityState?.expanded}
+      aria-disabled={disabled}
     >
       {children}
     </Touchable>

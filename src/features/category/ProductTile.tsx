@@ -113,54 +113,58 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
     onPress(product, index);
   };
 
+  // The heart is a sibling of the tile's button, not a child: a button inside a button is invalid on
+  // the web (`<button>` in `<button>`) and makes two nested press targets on native.
   return (
-    <PressableScale
-      onPress={handlePress}
-      accessibilityLabel={`${name}, ${price}`}
-      testID={testIds.productTile(index)}
-      style={styles.tile}
-    >
-      <View
-        style={styles.body}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
+    <View style={styles.cell}>
+      <PressableScale
+        onPress={handlePress}
+        accessibilityLabel={`${name}, ${price}`}
+        testID={testIds.productTile(index)}
+        style={styles.tile}
       >
-        <Animated.View ref={imageRef} style={[styles.imageBox, hiddenStyle]}>
-          <ProductImage
-            productId={product.id}
-            displaySize={imageSize}
-            placeholderColor={product.dominantColor}
-            style={styles.image}
-          />
-          {discount > 0 ? (
-            <DiscountTag percent={discount} style={styles.discount} />
-          ) : null}
-        </Animated.View>
-        <Text
-          variant="caption"
-          tone="muted"
-          numberOfLines={1}
-          style={styles.brand}
+        <View
+          style={styles.body}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
         >
-          {ar ? product.brandAr : product.brand}
-        </Text>
-        <Text
-          variant="label"
-          numberOfLines={2}
-          style={{ minHeight: metrics.name }}
-        >
-          {name}
-        </Text>
-        <View style={styles.footer}>
-          <RatingInline rating={product.rating} reviews={product.reviews} />
-          <PriceBlock
-            price={product.price}
-            oldPrice={product.oldPrice}
-            size="tile"
-          />
+          <Animated.View ref={imageRef} style={[styles.imageBox, hiddenStyle]}>
+            <ProductImage
+              productId={product.id}
+              displaySize={imageSize}
+              placeholderColor={product.dominantColor}
+              style={styles.image}
+            />
+            {discount > 0 ? (
+              <DiscountTag percent={discount} style={styles.discount} />
+            ) : null}
+          </Animated.View>
+          <Text
+            variant="caption"
+            tone="muted"
+            numberOfLines={1}
+            style={styles.brand}
+          >
+            {ar ? product.brandAr : product.brand}
+          </Text>
+          <Text
+            variant="label"
+            numberOfLines={2}
+            style={{ minHeight: metrics.name }}
+          >
+            {name}
+          </Text>
+          <View style={styles.footer}>
+            <RatingInline rating={product.rating} reviews={product.reviews} />
+            <PriceBlock
+              price={product.price}
+              oldPrice={product.oldPrice}
+              size="tile"
+            />
+          </View>
         </View>
-      </View>
-      {/* Outside the hidden body so TalkBack can reach it, and outside the picture box so the hero
+      </PressableScale>
+      {/* Outside the tile's button so TalkBack can reach it, and outside the picture box so the hero
           transition never hides it. It subscribes to its own id, so a toggle re-renders the heart only. */}
       <View style={styles.heart} pointerEvents="box-none">
         <HeartButton
@@ -169,7 +173,7 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
           testID={testIds.favoriteTile(index)}
         />
       </View>
-    </PressableScale>
+    </View>
   );
 }
 
@@ -184,7 +188,7 @@ export function ProductTileSkeleton({ width }: { width: number }) {
   const metrics = useTileMetrics();
   const image = tileImageSize(width);
   return (
-    <View style={[styles.tile, styles.skeletonTile, { width }]}>
+    <View style={[styles.cell, styles.tile, styles.skeletonTile, { width }]}>
       <Skeleton
         width={image}
         height={image}
@@ -211,12 +215,20 @@ export function ProductTileSkeleton({ width }: { width: number }) {
 
 const useStyles = makeStyles((c) => ({
   // The heart's 48 dp touch box sits in the picture's top-end corner; its drawn disc is smaller.
-  heart: { position: "absolute", top: TILE_PADDING, end: TILE_PADDING },
-  tile: {
-    // flexGrow: FlashList gives every cell in a row the height of the tallest one; the tile fills it.
+  // Measured from the cell, so it adds the tile's border to land in the same corner as before.
+  heart: {
+    position: "absolute",
+    top: TILE_PADDING + size.hairline,
+    end: TILE_PADDING + size.hairline,
+  },
+  // flexGrow: FlashList gives every cell in a row the height of the tallest one; cell and tile fill it.
+  cell: {
     flexGrow: 1,
     marginHorizontal: layout.gridGap / 2,
     marginBottom: layout.gridGap,
+  },
+  tile: {
+    flexGrow: 1,
     padding: TILE_PADDING,
     borderRadius: radius.tile,
     borderWidth: size.hairline,

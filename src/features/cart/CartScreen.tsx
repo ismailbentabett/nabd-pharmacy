@@ -22,8 +22,8 @@
 import { useRouter } from 'expo-router';
 import { ShoppingBag } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { Platform, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { findProduct } from '@/core/catalog';
@@ -41,7 +41,12 @@ import { UndoBar } from '@/ui/UndoBar';
 import { onFirstScreenLayout } from '@/ui/LaunchVeil';
 
 import { CartList } from './CartList';
-import { enterAfterExit, enterNow, exitCollapse, reducedEnter, reducedEnterAfterExit, reducedExit } from './cartMotion';
+import { enterAfterExit, enterNow, exitCollapse, reducedEnter, reducedEnterAfterExit, reducedExit, webEnter, webExit } from './cartMotion';
+import { duration } from '@/motion/springs';
+
+const WEB = Platform.OS === 'web';
+// Web plays only Reanimated's predefined builders (see cartMotion.ts): fade in after the old view leaves.
+const webEnterAfterExit = FadeInDown.duration(duration.exit).delay(duration.exit);
 import { CartSummary } from './CartSummary';
 import { CheckoutSuccess } from './CheckoutSuccess';
 
@@ -83,7 +88,7 @@ export function CartScreen() {
   const removedMessage = removed
     ? t('cart.removedItem', { name: lang === 'ar' ? removed.nameAr : removed.name })
     : t('cart.removed');
-  const exiting = reduceMotion ? reducedExit : exitCollapse;
+  const exiting = reduceMotion ? reducedExit : WEB ? webExit : exitCollapse;
   const hasLines = ids.length > 0;
 
   // An order confirmation belongs to the cart it emptied: once something new is added, it is stale.
@@ -108,7 +113,7 @@ export function CartScreen() {
           <Animated.View
             key="empty"
             style={styles.centre}
-            entering={reduceMotion ? reducedEnterAfterExit : enterAfterExit}
+            entering={reduceMotion ? reducedEnterAfterExit : WEB ? webEnterAfterExit : enterAfterExit}
           >
             <CheckoutSuccess />
             <EmptyState
@@ -137,7 +142,7 @@ export function CartScreen() {
         </View>
       </View>
       {ids.length > 0 ? (
-        <Animated.View entering={reduceMotion ? reducedEnter : enterNow} exiting={exiting}>
+        <Animated.View entering={reduceMotion ? reducedEnter : WEB ? webEnter : enterNow} exiting={exiting}>
           <CartSummary />
         </Animated.View>
       ) : null}
