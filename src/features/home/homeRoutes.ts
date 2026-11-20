@@ -27,3 +27,8 @@ export function openCategory(category: CategoryId | null): void {
 export function openProduct(id: string, prepare?: () => void): void {
   openProductPage(id, { prepare });
 }
+
+/** The search page: a pushed stack screen, so Back returns to Home with its scroll intact. */
+export function openSearch(): void {
+  router.push('/search');
+}

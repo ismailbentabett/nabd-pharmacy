@@ -271,13 +271,14 @@ describe('Home sends the user to the right place', () => {
     await unmount();
   });
 
-  it('search and "See all" open the whole catalogue; a best seller opens its product', async () => {
+  it('search opens the search page, "See all" the whole catalogue, a best seller its product', async () => {
     const { unmount } = await renderHome();
     await pressNative(testIds.homeSearch);
+    expect(push).toHaveBeenCalledWith('/search');
     await pressNative(testIds.homeSeeAll);
     // "All" is sent explicitly, so a category the user picked earlier on the tab does not survive.
     const all = { pathname: '/category', params: { category: 'all' } };
-    expect(navigate.mock.calls).toEqual([[all], [all]]);
+    expect(navigate.mock.calls).toEqual([[all]]);
 
     const product = firstBestSeller();
     await pressNative(testIds.homeBestSeller(product.id));

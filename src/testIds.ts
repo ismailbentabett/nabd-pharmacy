@@ -9,6 +9,7 @@ export const testIds = {
     category: 'screen-category',
     cart: 'screen-cart',
     product: 'screen-product',
+    search: 'screen-search',
   },
   tab: {
     index: 'tab-home',
@@ -77,6 +78,17 @@ export const testIds = {
   filterSheet: 'filter-sheet',
   sheetApply: 'filter-sheet-apply',
   sheetReset: 'filter-sheet-reset',
+  search: {
+    input: 'search-input',
+    back: 'search-back',
+    clear: 'search-clear',
+    count: 'search-count',
+    loading: 'search-loading',
+    idle: 'search-idle',
+    empty: 'search-empty',
+    error: 'search-error',
+    result: (id: string) => `search-result-${id}`,
+  },
 } as const;
 
 /** The tab routes, by file name under `app/(tabs)/`. */

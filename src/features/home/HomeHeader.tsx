@@ -52,7 +52,7 @@ import {
   HEADER,
   isCollapsed,
 } from './headerMath';
-import { openCategory } from './homeRoutes';
+import { openSearch } from './homeRoutes';
 
 const SMALL_ICON = 16;
 const SEARCH_ICON = 20;
@@ -91,8 +91,6 @@ export function HomeHeader({ scrollY }: HomeHeaderProps) {
     ],
   }));
 
-  // There is no search screen (G-01): the field opens the full catalogue, like the site's search page.
-  const openSearch = () => openCategory(null);
 
   return (
     <Animated.View

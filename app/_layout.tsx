@@ -72,6 +72,7 @@ export default function RootLayout() {
               {fontsReady ? (
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="search" options={{ animation: 'fade_from_bottom' }} />
                   <Stack.Screen
                     name="product/[id]"
                     options={{ presentation: 'transparentModal', animation: 'none', headerShown: false }}

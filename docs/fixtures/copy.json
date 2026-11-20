@@ -86,7 +86,13 @@
     "a11y.gallery": "Product images",
     "a11y.rating": "Rated {r} out of 5",
     "a11y.addedToCart": "{name} added to cart",
-    "a11y.favorite": "Save {name} to favourites"
+    "a11y.favorite": "Save {name} to favourites",
+    "search.placeholder": "Search vitamins, skincare, brands",
+    "search.clear": "Clear search",
+    "search.idle.title": "Find what you need",
+    "search.idle.body": "Search by product name, brand or category, in English or Arabic.",
+    "search.empty.title": "No matches for “{query}”",
+    "search.empty.body": "Check the spelling, or try a brand or a shorter word."
   },
   "ar": {
     "app.name": "نبض",
@@ -174,7 +180,13 @@
     "a11y.gallery": "صور المنتج",
     "a11y.rating": "التقييم {r} من 5",
     "a11y.addedToCart": "تمت إضافة {name} إلى السلة",
-    "a11y.favorite": "حفظ {name} في المفضلة"
+    "a11y.favorite": "حفظ {name} في المفضلة",
+    "search.placeholder": "ابحث عن الفيتامينات، العناية بالبشرة، الماركات",
+    "search.clear": "مسح البحث",
+    "search.idle.title": "ابحث عمّا تحتاجه",
+    "search.idle.body": "ابحث باسم المنتج أو الماركة أو الفئة، بالعربية أو الإنجليزية.",
+    "search.empty.title": "لا نتائج لـ «{query}»",
+    "search.empty.body": "تأكد من الإملاء، أو جرّب اسم ماركة أو كلمة أقصر."
   },
   "plurals": {
     "_": "CLDR plural categories. English: one / other. Arabic: zero (0) / one (1) / two (2) / few (n % 100 in 3-10) / many (n % 100 in 11-99) / other. An optional English 'zero' form overrides 'other' for 0. {n} is formatted with Western digits and thousands separators.",
@@ -211,6 +223,10 @@
         "zero": "Cart, empty",
         "one": "Cart, {n} item",
         "other": "Cart, {n} items"
+      },
+      "search.results": {
+        "one": "1 result",
+        "other": "{n} results"
       }
     },
     "ar": {
@@ -269,6 +285,14 @@
         "few": "السلة، {n} منتجات",
         "many": "السلة، {n} منتجاً",
         "other": "السلة، {n} منتج"
+      },
+      "search.results": {
+        "zero": "لا توجد نتائج",
+        "one": "نتيجة واحدة",
+        "two": "نتيجتان",
+        "few": "{n} نتائج",
+        "many": "{n} نتيجة",
+        "other": "{n} نتيجة"
       }
     }
   }
