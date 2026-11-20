@@ -1,0 +1,22 @@
+# Maestro smoke: tabs -> category -> product -> add -> cart.
+appId: com.nabd.pharmacy
+---
+- launchApp
+- assertVisible:
+    id: "home-banner"
+- tapOn:
+    id: "tab-category"
+- assertVisible:
+    id: "product-grid"
+- tapOn:
+    id: "product-tile-0"
+- assertVisible:
+    id: "add-to-cart"
+- tapOn:
+    id: "add-to-cart"
+- assertVisible:
+    id: "cart-badge"
+- tapOn:
+    id: "tab-cart"
+- assertVisible:
+    id: "cart-total"

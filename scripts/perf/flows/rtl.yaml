@@ -1,0 +1,11 @@
+# Maestro: toggle Arabic and assert mirrored UI.
+appId: com.nabd.pharmacy
+---
+- launchApp
+- tapOn:
+    id: "lang-toggle"
+- assertVisible: "الرئيسية"
+- tapOn:
+    id: "tab-category"
+- assertVisible:
+    id: "product-grid"

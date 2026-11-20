@@ -1,0 +1,13 @@
+# Line endings: LF in the repo on every OS (the project is edited on Windows).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.keystore binary
+*.pdf binary
+*.mp4 binary

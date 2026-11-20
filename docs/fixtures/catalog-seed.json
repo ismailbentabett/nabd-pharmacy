@@ -1,0 +1,109 @@
+{
+  "_note": "Content tables for the seeded generator. All brands are FICTIONAL. Arabic must be proofread by a native speaker before submission (flag in _prep/START_HERE.md). Digits in nameAr use Arabic-Indic per the brief's sample; money uses the digit policy in src/i18n/format.ts.",
+  "seed": 20261116,
+  "pageSize": 20,
+  "total": 1000,
+  "perCategory": 125,
+  "categories": [
+    { "id": "vitamins", "en": "Vitamins", "ar": "الفيتامينات", "icon": "pill", "priceMin": 24.95, "priceMax": 189.0 },
+    { "id": "skincare", "en": "Skincare", "ar": "العناية بالبشرة", "icon": "sparkles", "priceMin": 29.0, "priceMax": 259.0 },
+    { "id": "baby-care", "en": "Baby care", "ar": "العناية بالطفل", "icon": "baby", "priceMin": 12.5, "priceMax": 149.0 },
+    { "id": "personal-care", "en": "Personal care", "ar": "العناية الشخصية", "icon": "bath", "priceMin": 8.95, "priceMax": 99.0 },
+    { "id": "medicines", "en": "Medicines", "ar": "الأدوية", "icon": "cross", "priceMin": 5.5, "priceMax": 79.0 },
+    { "id": "hair-care", "en": "Hair care", "ar": "العناية بالشعر", "icon": "scissors", "priceMin": 15.0, "priceMax": 139.0 },
+    { "id": "fitness", "en": "Fitness", "ar": "اللياقة البدنية", "icon": "dumbbell", "priceMin": 39.0, "priceMax": 349.0 },
+    { "id": "fragrance", "en": "Fragrance", "ar": "العطور", "icon": "flask-conical", "priceMin": 79.0, "priceMax": 689.0 }
+  ],
+  "brands": [
+    { "en": "VitaWell", "ar": "فيتاويل", "for": ["vitamins", "fitness", "medicines"] },
+    { "en": "NordaCare", "ar": "نوردا كير", "for": ["vitamins", "personal-care", "medicines"] },
+    { "en": "PharmaLea", "ar": "فارماليا", "for": ["medicines", "vitamins", "personal-care"] },
+    { "en": "Dermaluxe", "ar": "ديرمالوكس", "for": ["skincare", "hair-care", "personal-care"] },
+    { "en": "Oasis Lab", "ar": "واحة لاب", "for": ["skincare", "hair-care", "personal-care"] },
+    { "en": "Zenara", "ar": "زينارا", "for": ["skincare", "fragrance", "personal-care"] },
+    { "en": "BabyNest", "ar": "بيبي نست", "for": ["baby-care"] },
+    { "en": "Little Palm", "ar": "ليتل بالم", "for": ["baby-care"] },
+    { "en": "HairRoots", "ar": "هير روتس", "for": ["hair-care"] },
+    { "en": "FitFuel", "ar": "فيت فيول", "for": ["fitness", "vitamins"] },
+    { "en": "Peak Form", "ar": "بيك فورم", "for": ["fitness"] },
+    { "en": "Aroma Nuur", "ar": "أروما نور", "for": ["fragrance"] },
+    { "en": "Sahara Pure", "ar": "صحراء بيور", "for": ["fragrance", "personal-care", "skincare"] },
+    { "en": "Lumea", "ar": "لوميا", "for": ["skincare", "fragrance"] }
+  ],
+  "types": {
+    "vitamins": [
+      ["Vitamin C", "فيتامين سي"], ["Vitamin D3", "فيتامين د3"], ["Omega-3 Fish Oil", "زيت السمك أوميغا 3"],
+      ["Multivitamin Daily", "فيتامينات متعددة يومية"], ["Magnesium Citrate", "سترات المغنيسيوم"], ["Zinc Complex", "مركّب الزنك"],
+      ["Iron + B12", "حديد + ب12"], ["Biotin", "بيوتين"], ["Calcium + D", "كالسيوم + د"],
+      ["Vitamin B Complex", "فيتامين ب المركّب"], ["Probiotic", "بروبيوتيك"], ["Collagen Peptides", "ببتيدات الكولاجين"]
+    ],
+    "skincare": [
+      ["Hydrating Face Cream", "كريم ترطيب للوجه"], ["Vitamin C Serum", "سيروم فيتامين سي"], ["Gentle Foaming Cleanser", "غسول رغوي لطيف"],
+      ["SPF 50 Sunscreen", "واقي شمس بعامل حماية 50"], ["Niacinamide Serum", "سيروم النياسيناميد"], ["Night Repair Cream", "كريم ليلي مجدد"],
+      ["Micellar Water", "ماء ميسيلار"], ["Eye Contour Gel", "جل لمحيط العين"], ["Clay Face Mask", "ماسك الطين للوجه"],
+      ["Soothing Toner", "تونر مهدئ"], ["Lip Balm SPF 15", "مرطب شفاه بعامل حماية 15"], ["Body Lotion", "لوشن للجسم"]
+    ],
+    "baby-care": [
+      ["Gentle Baby Wash", "غسول لطيف للأطفال"], ["Baby Wipes", "مناديل مبللة للأطفال"], ["Diaper Rash Cream", "كريم التهاب الحفاض"],
+      ["Baby Shampoo", "شامبو للأطفال"], ["Baby Lotion", "لوشن للأطفال"], ["Newborn Diapers", "حفاضات حديثي الولادة"],
+      ["Feeding Bottle", "رضّاعة"], ["Soothing Pacifier", "لهّاية مهدئة"], ["Baby Powder", "بودرة للأطفال"],
+      ["Baby Oil", "زيت للأطفال"], ["Nursing Pads", "وسادات الرضاعة"], ["Baby Sunscreen", "واقي شمس للأطفال"]
+    ],
+    "personal-care": [
+      ["Soft Toothbrush", "فرشاة أسنان ناعمة"], ["Whitening Toothpaste", "معجون أسنان مبيّض"], ["Roll-on Deodorant", "مزيل عرق رول"],
+      ["Shower Gel", "جل استحمام"], ["Hand Sanitizer", "معقم لليدين"], ["Antibacterial Hand Wash", "غسول يدين مضاد للبكتيريا"],
+      ["Mouthwash", "غسول فم"], ["Razor Set", "طقم شفرات حلاقة"], ["Cotton Buds", "أعواد قطنية"],
+      ["Hand Cream", "كريم لليدين"], ["Intimate Wash", "غسول حساس"], ["Foot Care Cream", "كريم للعناية بالقدمين"]
+    ],
+    "medicines": [
+      ["Pain Relief Tablets", "أقراص مسكنة للألم"], ["Cold & Flu Relief", "تخفيف أعراض البرد والإنفلونزا"], ["Antacid Chewables", "أقراص مضغ مضادة للحموضة"],
+      ["Allergy Relief", "تخفيف أعراض الحساسية"], ["Cough Syrup", "شراب للسعال"], ["Throat Lozenges", "أقراص استحلاب للحلق"],
+      ["Oral Rehydration Salts", "أملاح الإماهة الفموية"], ["Antiseptic Solution", "محلول مطهّر"], ["Adhesive Bandages", "ضمادات لاصقة"],
+      ["Nasal Spray", "بخاخ أنف"], ["Digestive Enzymes", "إنزيمات هاضمة"], ["Eye Drops (lubricating)", "قطرة عين مرطبة"]
+    ],
+    "hair-care": [
+      ["Repair Shampoo", "شامبو مُرمِّم"], ["Moisture Conditioner", "بلسم مرطب"], ["Argan Hair Oil", "زيت الأرغان للشعر"],
+      ["Anti-Dandruff Shampoo", "شامبو مضاد للقشرة"], ["Hair Mask", "ماسك للشعر"], ["Leave-in Cream", "كريم بدون شطف"],
+      ["Scalp Serum", "سيروم لفروة الرأس"], ["Heat Protect Spray", "سبراي واقي من الحرارة"], ["Curl Defining Gel", "جل لتحديد التجعيد"],
+      ["Volume Mousse", "موس للكثافة"], ["Keratin Treatment", "علاج الكيراتين"], ["Dry Shampoo", "شامبو جاف"]
+    ],
+    "fitness": [
+      ["Whey Protein", "بروتين مصل اللبن"], ["Creatine Monohydrate", "كرياتين مونوهيدرات"], ["BCAA Powder", "مسحوق الأحماض الأمينية"],
+      ["Pre-Workout", "مكمّل ما قبل التمرين"], ["Resistance Bands Set", "طقم أحزمة المقاومة"], ["Yoga Mat", "سجادة يوغا"],
+      ["Shaker Bottle", "كوب شيكر"], ["Protein Bars (box)", "ألواح بروتين (علبة)"], ["Electrolyte Drink Mix", "مسحوق مشروب الإلكتروليت"],
+      ["Jump Rope", "حبل قفز"], ["Foam Roller", "أسطوانة تدليك"], ["Gym Towel", "منشفة رياضية"]
+    ],
+    "fragrance": [
+      ["Eau de Parfum", "ماء عطر"], ["Eau de Toilette", "ماء تواليت"], ["Oud Intense", "عود مركّز"],
+      ["Body Mist", "بخاخ للجسم"], ["Musk Roll-on", "مسك رول"], ["Bakhoor Chips", "رقائق بخور"],
+      ["Perfume Oil", "زيت عطري"], ["Travel Spray", "عطر للسفر"], ["Amber Woods", "عنبر وخشب"],
+      ["Rose Garden", "حديقة الورد"], ["Citrus Fresh", "حمضيات منعشة"], ["Vanilla Night", "فانيلا الليل"]
+    ]
+  },
+  "variants": {
+    "vitamins": [["60 tablets", "60 قرصاً"], ["90 capsules", "90 كبسولة"], ["120 softgels", "120 كبسولة هلامية"], ["30 gummies", "30 حلوى مضغ"], ["1000 mg, 60 tablets", "1000 ملغ، 60 قرصاً"], ["500 mg, 100 capsules", "500 ملغ، 100 كبسولة"]],
+    "skincare": [["50 ml", "50 مل"], ["30 ml", "30 مل"], ["100 ml", "100 مل"], ["200 ml", "200 مل"], ["For sensitive skin, 50 ml", "للبشرة الحساسة، 50 مل"], ["For oily skin, 100 ml", "للبشرة الدهنية، 100 مل"]],
+    "baby-care": [["200 ml", "200 مل"], ["400 ml", "400 مل"], ["80 wipes", "80 منديلاً"], ["Pack of 3", "عبوة من 3"], ["Size 2, 58 pcs", "مقاس 2، 58 قطعة"], ["100 g", "100 غ"]],
+    "personal-care": [["75 ml", "75 مل"], ["250 ml", "250 مل"], ["500 ml", "500 مل"], ["Pack of 2", "عبوة من 2"], ["Pack of 6", "عبوة من 6"], ["100 g", "100 غ"]],
+    "medicines": [["500 mg, 24 tablets", "500 ملغ، 24 قرصاً"], ["200 ml", "200 مل"], ["20 lozenges", "20 قرص استحلاب"], ["10 sachets", "10 أكياس"], ["Pack of 40", "عبوة من 40"], ["15 ml", "15 مل"]],
+    "hair-care": [["250 ml", "250 مل"], ["400 ml", "400 مل"], ["100 ml", "100 مل"], ["For dry hair, 250 ml", "للشعر الجاف، 250 مل"], ["For colored hair, 400 ml", "للشعر المصبوغ، 400 مل"], ["150 ml", "150 مل"]],
+    "fitness": [["1 kg", "1 كغ"], ["2 kg", "2 كغ"], ["300 g", "300 غ"], ["Box of 12", "علبة من 12"], ["Medium", "وسط"], ["Large", "كبير"]],
+    "fragrance": [["50 ml", "50 مل"], ["100 ml", "100 مل"], ["30 ml", "30 مل"], ["For her, 100 ml", "للنساء، 100 مل"], ["For him, 100 ml", "للرجال، 100 مل"], ["Unisex, 50 ml", "للجنسين، 50 مل"]]
+  },
+  "descriptions": {
+    "vitamins": ["A daily supplement to support your routine. Take as directed on the label.", "مكمّل غذائي يومي يدعم روتينك. يُستخدم حسب الإرشادات على العبوة."],
+    "skincare": ["A lightweight formula that sits well under makeup and sunscreen. Dermatologically tested.", "تركيبة خفيفة تناسب الاستخدام تحت المكياج وواقي الشمس. مختبرة جلدياً."],
+    "baby-care": ["Mild, fragrance-light formula made for everyday use. Tested on sensitive skin.", "تركيبة لطيفة بعطر خفيف للاستخدام اليومي. مختبرة على البشرة الحساسة."],
+    "personal-care": ["Everyday essentials, made to be simple and reliable.", "أساسيات يومية بسيطة وموثوقة."],
+    "medicines": ["Over-the-counter product. Read the leaflet and use as directed. Ask your pharmacist if unsure.", "منتج بدون وصفة طبية. اقرأ النشرة واستخدمه حسب الإرشادات. استشر الصيدلي عند الحاجة."],
+    "hair-care": ["Salon-style care at home. Leaves hair soft and easy to manage.", "عناية بأسلوب الصالونات في المنزل. تمنح الشعر نعومة وسهولة في التصفيف."],
+    "fitness": ["Built for training days. Mixes easily, travels well.", "مصمم لأيام التمرين. سهل التحضير وسهل الحمل."],
+    "fragrance": ["A long-lasting scent with a warm, balanced dry-down.", "عطر يدوم طويلاً بقاعدة دافئة ومتوازنة."]
+  },
+  "banners": [
+    { "id": "b1", "en": { "title": "Summer skincare edit", "sub": "Up to 30% off SPF & hydration", "cta": "Shop skincare" }, "ar": { "title": "عناية الصيف بالبشرة", "sub": "خصم حتى 30٪ على واقيات الشمس والترطيب", "cta": "تسوّقي العناية بالبشرة" }, "category": "skincare", "tint": "primary" },
+    { "id": "b2", "en": { "title": "Daily vitamins, simplified", "sub": "Bundle & save on bestsellers", "cta": "Shop vitamins" }, "ar": { "title": "فيتاميناتك اليومية بسهولة", "sub": "وفّر مع حزم الأكثر مبيعاً", "cta": "تسوّق الفيتامينات" }, "category": "vitamins", "tint": "secondary" },
+    { "id": "b3", "en": { "title": "Mom & baby essentials", "sub": "Gentle care from day one", "cta": "Shop baby care" }, "ar": { "title": "أساسيات الأم والطفل", "sub": "عناية لطيفة من اليوم الأول", "cta": "تسوّق العناية بالطفل" }, "category": "baby-care", "tint": "primary" },
+    { "id": "b4", "en": { "title": "Free delivery over 100 SAR", "sub": "Pharmacy at your door", "cta": "Start shopping" }, "ar": { "title": "توصيل مجاني فوق 100 ر.س", "sub": "الصيدلية عند بابك", "cta": "ابدأ التسوق" }, "category": null, "tint": "secondary" }
+  ]
+}

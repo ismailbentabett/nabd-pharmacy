@@ -1,0 +1,125 @@
+{
+  "formula": "vat = floor((6*gross + 23) / 46)  // == round_half_up(gross*15/115), integer halalas; net = gross - vat",
+  "unit": "halalas (1 SAR = 100 halalas)",
+  "cases": [
+    {
+      "name": "empty",
+      "lines": [],
+      "expected": {
+        "gross": 0,
+        "vat": 0,
+        "net": 0
+      }
+    },
+    {
+      "name": "single item 49.95 x1",
+      "lines": [
+        {
+          "priceH": 4995,
+          "qty": 1
+        }
+      ],
+      "expected": {
+        "gross": 4995,
+        "vat": 652,
+        "net": 4343
+      }
+    },
+    {
+      "name": "single item 49.95 x3",
+      "lines": [
+        {
+          "priceH": 4995,
+          "qty": 3
+        }
+      ],
+      "expected": {
+        "gross": 14985,
+        "vat": 1955,
+        "net": 13030
+      }
+    },
+    {
+      "name": "mixed",
+      "lines": [
+        {
+          "priceH": 4995,
+          "qty": 2
+        },
+        {
+          "priceH": 12000,
+          "qty": 1
+        },
+        {
+          "priceH": 899,
+          "qty": 5
+        }
+      ],
+      "expected": {
+        "gross": 26485,
+        "vat": 3455,
+        "net": 23030
+      }
+    },
+    {
+      "name": "exactly 115.00 -> vat 15.00",
+      "lines": [
+        {
+          "priceH": 11500,
+          "qty": 1
+        }
+      ],
+      "expected": {
+        "gross": 11500,
+        "vat": 1500,
+        "net": 10000
+      }
+    },
+    {
+      "name": "half-halala boundary",
+      "lines": [
+        {
+          "priceH": 23,
+          "qty": 1
+        }
+      ],
+      "expected": {
+        "gross": 23,
+        "vat": 3,
+        "net": 20
+      }
+    },
+    {
+      "name": "float trap 0.1+0.2 style",
+      "lines": [
+        {
+          "priceH": 10,
+          "qty": 1
+        },
+        {
+          "priceH": 20,
+          "qty": 1
+        }
+      ],
+      "expected": {
+        "gross": 30,
+        "vat": 4,
+        "net": 26
+      }
+    },
+    {
+      "name": "large qty",
+      "lines": [
+        {
+          "priceH": 19999,
+          "qty": 99
+        }
+      ],
+      "expected": {
+        "gross": 1979901,
+        "vat": 258248,
+        "net": 1721653
+      }
+    }
+  ]
+}

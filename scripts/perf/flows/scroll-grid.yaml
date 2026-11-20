@@ -1,0 +1,20 @@
+# Maestro: open Category and scroll the grid up/down. Used by flashlight.sh. testIDs come from src/testIds.ts.
+appId: com.nabd.pharmacy
+---
+- launchApp
+- tapOn:
+    id: "tab-category"
+- assertVisible:
+    id: "product-grid"
+- repeat:
+    times: 6
+    commands:
+      - swipe:
+          direction: UP
+          duration: 150
+      - swipe:
+          direction: UP
+          duration: 150
+      - swipe:
+          direction: DOWN
+          duration: 150
