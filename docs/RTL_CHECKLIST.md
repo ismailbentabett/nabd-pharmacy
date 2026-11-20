@@ -87,7 +87,7 @@ Mark each line EN / AR when it passes. Anything failing goes into `docs/PLAN.md`
 | Stepper order | In both languages the stepper follows the row direction: minus at the start, plus at the end (so in Arabic the plus is on the left). Digits themselves do not change | Digits reversed ("12" shown as "21"); plus and minus overlapping |
 | Stepper at 1 | The minus becomes a bin and removes the line (undoable) | Disabled with no feedback |
 | Row layout | Thumbnail at the start, price at the end | Thumbnail on the left in Arabic |
-| Totals | Labels at the start, values at the end; subtotal, VAT 15% and total each on their own line | Values at the start in Arabic |
+| Totals | Labels at the start, values at the end; subtotal, TVA 19% and total each on their own line | Values at the start in Arabic |
 | Empty cart | Centred state, no clipped text | Text cut at the edges |
 
 ## 6. Gestures summary (one pass, both languages)
@@ -108,8 +108,8 @@ If the content ever moves against the finger, or a swipe works from the wrong ed
 
 | Item | Correct | Bug |
 |---|---|---|
-| Digits | Western digits (0-9) in both languages (ADR, as Saudi retail apps do) | Arabic-Indic digits mixed in |
-| Price | English: `49.95 SAR`. Arabic: the number sits at the start (right) and "ر.س" to its left; reading right to left gives "49.95 ر.س" | "ر.س" jammed against the digits, or the number split around the symbol |
+| Digits | Western digits (0-9) in both languages (ADR, as Algerian retail apps do) | Arabic-Indic digits mixed in |
+| Price | English: `1,800.00 DA`. Arabic: the number sits at the start (right) and "د.ج" to its left; reading right to left gives "1,800.00 د.ج" | "د.ج" jammed against the digits, or the number split around the symbol |
 | Old price | Struck through, next to the price with a gap, order follows the row direction | Strike line cuts through the currency in the wrong place |
 | Thousands | `1,234.50` in both languages | `1.234,50` or reversed groups |
 | Totals column | Digits are fixed-width: totals do not jitter while the quantity changes | Width changes as digits change |

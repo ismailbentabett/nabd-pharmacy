@@ -17,12 +17,12 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, { type SharedValue } from 'react-native-reanimated';
 
 import { findProduct } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import { PressableScale } from '@/design/PressableScale';
 import { Text } from '@/design/Text';
 import { makeStyles, useColors } from '@/design/theme';
 import { radius, size, space } from '@/design/tokens';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { cartActions, getCartState, useCartLine } from '@/state/cart.store';
 import { testIds } from '@/testIds';
@@ -57,9 +57,9 @@ export function CartRow({ id, openRowId }: { id: string; openRowId: SharedValue<
 
   const name = lang === 'ar' ? product.nameAr : product.name;
   const brand = lang === 'ar' ? product.brandAr : product.brand;
-  const unitH = toHalalas(product.price);
-  const unit = formatSar(unitH, lang);
-  const total = formatSar(unitH * line.qty, lang);
+  const unitH = toCentimes(product.price);
+  const unit = formatDzd(unitH, lang);
+  const total = formatDzd(unitH * line.qty, lang);
   const removeLabel = t('a11y.remove', { name });
 
   const onAccessibilityAction = (event: AccessibilityActionEvent) => {

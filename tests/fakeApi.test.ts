@@ -83,7 +83,7 @@ describe('filters and sort', () => {
   });
 
   it('an impossible filter returns an empty first page (the empty state)', async () => {
-    const res = await instant().getProductsPage({ page: 0, filters: { priceMin: 5000 } });
+    const res = await instant().getProductsPage({ page: 0, filters: { priceMin: 30000 } });
     expect(res.items).toHaveLength(0);
     expect(res.total).toBe(0);
     expect(res.hasMore).toBe(false);

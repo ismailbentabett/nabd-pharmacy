@@ -3,7 +3,7 @@
  *
  * Plain views and text, rendered once: the hero transition fades and lifts this whole block as one
  * layer (contentStyle), so nothing in here animates on its own. Names and descriptions follow the
- * current language; prices come from the catalog in SAR and are formatted through halalas
+ * current language; prices come from the catalog in DA and are formatted through centimes
  * (PriceBlock), so the page and the cart can never disagree by a rounding.
  */
 import { Star, Truck } from 'lucide-react-native';

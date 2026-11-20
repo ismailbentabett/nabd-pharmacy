@@ -14,7 +14,7 @@ import { progressBetween } from '@/motion/gestureMath';
 export const HEADER = {
   padTop: space.xs,
   /**
-   * "Deliver to Riyadh", one line. 32 dp still holds the Arabic label at the 1.5x font cap. The
+   * "Deliver to Algiers", one line. 32 dp still holds the Arabic label at the 1.5x font cap. The
    * language toggle is not in this row: it sits next to the search field, so it survives the collapse.
    */
   row: space.xxl,

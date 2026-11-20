@@ -1,24 +1,24 @@
 /**
  * The free-delivery line above the cart totals (WOW_MOMENTS #12): how much more to add, and how far
- * along the bar is. The threshold is on the VAT-inclusive total, because that is the number the
- * shopper sees (product page: "Free delivery over 100 SAR"). Integer halalas, like all money.
+ * along the bar is. The threshold is on the TVA-inclusive total, because that is the number the
+ * shopper sees (product page: "Free delivery over 4,000 DA"). Integer centimes, like all money.
  */
-import type { Halalas } from '@/core/money';
+import type { Centimes } from '@/core/money';
 
-/** 100.00 SAR. */
-export const FREE_DELIVERY_THRESHOLD_H: Halalas = 10_000;
+/** 4,000.00 DA. */
+export const FREE_DELIVERY_THRESHOLD_H: Centimes = 400_000;
 
 export type FreeDeliveryProgress = Readonly<{
-  /** Halalas still to add; 0 once unlocked. */
-  remaining: Halalas;
+  /** Centimes still to add; 0 once unlocked. */
+  remaining: Centimes;
   /** 0..1, for the bar. */
   progress: number;
   unlocked: boolean;
 }>;
 
 export function freeDeliveryProgress(
-  gross: Halalas,
-  threshold: Halalas = FREE_DELIVERY_THRESHOLD_H,
+  gross: Centimes,
+  threshold: Centimes = FREE_DELIVERY_THRESHOLD_H,
 ): FreeDeliveryProgress {
   const unlocked = gross >= threshold;
   return {

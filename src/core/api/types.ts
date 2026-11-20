@@ -11,7 +11,7 @@ export const SORT_KEYS: readonly SortKey[] = ['relevance', 'priceAsc', 'priceDes
 export interface ProductFilters {
   /** Empty or missing = every category. */
   categories?: readonly CategoryId[];
-  /** SAR, inclusive. */
+  /** DA, inclusive. */
   priceMin?: number;
   priceMax?: number;
   inStockOnly?: boolean;

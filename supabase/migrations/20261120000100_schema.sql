@@ -1,4 +1,4 @@
--- Nabd schema. Money is stored as integer halalas (1 SAR = 100 halalas), VAT included, exactly like
+-- Nabd schema. Money is stored as integer centimes (1 DA = 100 centimes), TVA included, exactly like
 -- the client (src/core/money.ts). No floats ever touch a price column.
 --
 -- Catalog tables (categories, products, banners) are filled by supabase/seed.sql, which is generated

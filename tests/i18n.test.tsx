@@ -168,7 +168,7 @@ describe('direction and translator hooks', () => {
     const { result, rerender } = await renderHook(() => useT(), { wrapper: wrapperFor('ar') });
     const first = result.current;
     expect(first.lang).toBe('ar');
-    expect(first.t('currency')).toBe('ر.س');
+    expect(first.t('currency')).toBe('د.ج');
     await rerender({});
     expect(result.current).toBe(first);
   });

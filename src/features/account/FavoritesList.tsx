@@ -11,13 +11,13 @@ import { memo } from 'react';
 import { View } from 'react-native';
 
 import { findProduct } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import { PressableScale } from '@/design/PressableScale';
 import { Text } from '@/design/Text';
 import { makeStyles } from '@/design/theme';
 import { radius, size, space } from '@/design/tokens';
 import { openProduct } from '@/features/home/homeRoutes';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { useFavoriteIds } from '@/state/favorites.store';
 import { testIds } from '@/testIds';
@@ -69,7 +69,7 @@ const FavoriteRow = memo(function FavoriteRow({ id }: { id: string }) {
       testID={testIds.account.favorite(id)}
       onPress={() => openProduct(id)}
       accessibilityRole="button"
-      accessibilityLabel={`${name}, ${formatSar(toHalalas(product.price), lang)}`}
+      accessibilityLabel={`${name}, ${formatDzd(toCentimes(product.price), lang)}`}
       style={styles.row}
     >
       <View style={styles.rowContent} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">

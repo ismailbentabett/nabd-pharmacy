@@ -26,14 +26,14 @@ import { renderWithProviders } from './render';
 
 const METRICS = { frame: { x: 0, y: 0, width: 400, height: 900 }, insets: { top: 24, left: 0, right: 0, bottom: 0 } };
 
-/** 115.00 SAR: the VAT share is exactly 15.00. */
-export const P115 = 'p-0952';
-/** 8.99 SAR. */
-export const P899 = 'p-0380';
-/** 46.99 SAR. */
-export const P4699 = 'p-0001';
-/** 12.95 SAR. */
-export const P1295 = 'p-0002';
+/** 5,950.00 DA: the TVA share is exactly 950.00. */
+export const P5950 = 'p-0296';
+/** 350.00 DA. */
+export const P350 = 'p-0380';
+/** 1,650.00 DA. */
+export const P1650 = 'p-0001';
+/** 450.00 DA. */
+export const P450 = 'p-0002';
 
 export function product(id: string): Product {
   const found = findProduct(id);

@@ -35,7 +35,7 @@ describe('seed SQL', () => {
     expect(sqlText("Johnson's")).toBe("'Johnson''s'");
   });
 
-  it('writes money as integer halalas and a missing old price as null', () => {
+  it('writes money as integer centimes and a missing old price as null', () => {
     const p = { ...input.products[0]!, price: 49.95, oldPrice: null };
     const row = productRow(p, null);
     expect(row).toContain(', 4995, null, ');

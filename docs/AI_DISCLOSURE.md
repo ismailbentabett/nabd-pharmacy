@@ -12,8 +12,8 @@ marketing page: if a line below is not true at submission time, change it before
 
 ## What the AI did
 The AI wrote nearly all of the code, tests and docs in this repository, under the author's brief, rules and ADRs:
-- **Core**: the seeded catalog generator, the fake API (paging, 300–800 ms delay, 1-in-20 failures), integer-halala
-  money and VAT split, the cart reducer and store with undo, and their tests (`src/core/*`, `src/state/*`).
+- **Core**: the seeded catalog generator, the fake API (paging, 300–800 ms delay, 1-in-20 failures), integer-centime
+  money and TVA split, the cart reducer and store with undo, and their tests (`src/core/*`, `src/state/*`).
 - **Design system**: palette and tokens, type scale with the embedded IBM Plex fonts, `Text`, `PressableScale`,
   skeletons, shared UI (`src/design/*`, `src/ui/*`).
 - **Motion**: spring and timing tokens, live reduced-motion, haptics vocabulary, gesture math, the hero transition

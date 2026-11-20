@@ -32,14 +32,14 @@ FlashList v2 for the 1,000-item grid and rails; `keyExtractor` stable ids; `getI
 - Release build optimisation: `expo-build-properties` → `android.enableMinifyInReleaseBuilds`, `enableShrinkResourcesInReleaseBuilds`, `enablePngCrunchInReleaseBuilds`; native splash (JS-managed splash costs ~400 ms); embed fonts via config plugin; Baseline Profile = stretch.
 
 ## 5. RTL
-`I18nManager.forceRTL` requires reload; Android OK after reload; new-arch Yoga edge cases exist. Plan A (instant) vs Plan B (reload + persisted state) decided in Spike 2 (ADR-005). Always: logical props (`start/end`, `marginStart`), `useDirection()`; mirror directional icons only; numbers and logos stay LTR. Arabic typography: IBM Plex Sans Arabic, body line-height ≥ 1.6 (≈24 on 15), +1px optical size, avoid italics, test font scaling. Saudi riyal new glyph has patchy font support → "SAR"/"ر.س" text label.
+`I18nManager.forceRTL` requires reload; Android OK after reload; new-arch Yoga edge cases exist. Plan A (instant) vs Plan B (reload + persisted state) decided in Spike 2 (ADR-005). Always: logical props (`start/end`, `marginStart`), `useDirection()`; mirror directional icons only; numbers and logos stay LTR. Arabic typography: IBM Plex Sans Arabic, body line-height ≥ 1.6 (≈24 on 15), +1px optical size, avoid italics, test font scaling. Algerian dinar shown as a text label: "DA" in English, "د.ج" in Arabic (ISO code DZD).
 
 ## 6. Motion tokens (M3 Expressive, mass 1, damping = ζ·2·√k)
 spatialFast k800 ζ0.6 → 33.9 · spatialDefault k380 ζ0.8 → 31.2 · spatialSlow k200 ζ0.8 → 22.6 · effectsFast k3800 ζ1 → 123.3 · effectsDefault k1600 ζ1 → 80 · effectsSlow k800 ζ1 → 56.6. Quick feedback 100–200 ms; transitions 300–350 ms (budget < 350); add-to-cart feedback < 400 ms parallel to the action.
 
 ## 7. E-commerce UX facts
-Skeletons over spinners; sticky bottom CTA on product; thumb-zone actions; haptics on stepper/swipe thresholds; free-delivery progress nudge (Saudi pharmacy norm: free delivery over 100 SAR — display only); undo over confirm-dialogs; badge bump on add.
-Real Al-dawaa app (store listings; website blocked for fetch): Saudi pharmacy chain, bilingual EN/AR, prescription upload, clinic booking, Click & Collect, free delivery > 100 SAR, loyalty points. We take **layout & flow only** (G-05), no trademarks/logos.
+Skeletons over spinners; sticky bottom CTA on product; thumb-zone actions; haptics on stepper/swipe thresholds; free-delivery progress nudge (free delivery over 4,000 DA — display only); undo over confirm-dialogs; badge bump on add.
+Real Al-dawaa app (store listings; website blocked for fetch): Saudi pharmacy chain, bilingual EN/AR, prescription upload, clinic booking, Click & Collect, free delivery over a basket threshold, loyalty points. We take **layout & flow only** (G-05), no trademarks/logos.
 
 ## 8. Contrast (computed by `scripts/contrast.mjs`)
 See `docs/DESIGN.md §1`. Gold is never text on light backgrounds (1.58:1); muted on navy fails (2.60:1).

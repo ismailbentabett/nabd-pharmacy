@@ -11,7 +11,7 @@ import { PressableScale } from '@/design/PressableScale';
 import { Text } from '@/design/Text';
 import { makeStyles, useColors } from '@/design/theme';
 import { layout, radius, size, space } from '@/design/tokens';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { setLastPlacedOrder, useLastPlacedOrder } from '@/state/orders';
 import { testIds } from '@/testIds';
@@ -23,7 +23,7 @@ export function CheckoutSuccess() {
   const order = useLastPlacedOrder();
   if (order === null) return null;
 
-  const body = t('checkout.success.body', { id: orderNumber(order.id), total: formatSar(order.grossH, lang) });
+  const body = t('checkout.success.body', { id: orderNumber(order.id), total: formatDzd(order.grossH, lang) });
   const dismiss = t('checkout.success.dismiss');
 
   return (

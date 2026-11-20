@@ -6,7 +6,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 
 import { getCatalog } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import {
   CART_STORAGE_KEY,
   cartActions,
@@ -212,7 +212,7 @@ describe('cart hooks (F-05: re-render only for your own slice)', () => {
     await unmount();
   });
 
-  it('totals follow every change in the same update, VAT included in the price', async () => {
+  it('totals follow every change in the same update, TVA included in the price', async () => {
     const { result, unmount } = await renderHook(() => useCartTotals());
     expect(result.current).toEqual({ gross: 0, vat: 0, net: 0 });
 
@@ -220,10 +220,10 @@ describe('cart hooks (F-05: re-render only for your own slice)', () => {
       cartActions.add(A, 2);
       cartActions.add(B);
     });
-    const gross = toHalalas(first.price) * 2 + toHalalas(second.price);
+    const gross = toCentimes(first.price) * 2 + toCentimes(second.price);
     expect(result.current.gross).toBe(gross);
     expect(result.current.vat + result.current.net).toBe(gross);
-    expect(result.current.vat).toBe(Math.round((gross * 3) / 23));
+    expect(result.current.vat).toBe(Math.round((gross * 19) / 119));
     expect(getCartState().ids).toEqual([A, B]);
     await unmount();
   });

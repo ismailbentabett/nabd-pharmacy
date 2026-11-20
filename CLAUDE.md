@@ -26,7 +26,7 @@ numbers**, and **whether the author deeply understands the code** (live change +
   Don't write library code from memory. Use the `docs-verifier` agent when unsure.
 - **Animate `transform` + `opacity` only** (plus `backgroundColor`). Never `width/height/top/left/margin` per frame.
 - **Layout animations (`entering/exiting/layout`) only in NON-virtualised lists** (the cart). Never inside FlashList items.
-- **Money is integer halalas** everywhere in logic (`docs/CART_SPEC.md`). Floats only at display/boundary.
+- **Money is integer centimes** (1 DA = 100 centimes) everywhere in logic (`docs/CART_SPEC.md`). Floats only at display/boundary.
 - **Direction-agnostic code**: never read `I18nManager` in components; use `useDirection()`; use logical props
   (`start/end`, `marginStart`), never `left/right` for layout; gesture/transition math multiplies by `dir`.
 - **Accessibility floor**: touch targets ≥ 48dp, labels/roles on every control, contrast per `docs/DESIGN.md`,
@@ -65,7 +65,7 @@ gestures included) · reduce-motion variant · a11y labels · no per-frame JS ·
 ## 4. Where things live
 - Contract: `brief/BRIEF.md` · Plan: `docs/PLAN.md` · Trace: `docs/REQUIREMENTS_TRACE.md` · ADRs: `docs/DECISIONS.md`
 - Design system + anti-slop rules: `docs/DESIGN.md` · Signature moments: `docs/WOW_MOMENTS.md`
-- Data/fake API spec: `docs/FAKE_BACKEND.md` + `docs/fixtures/catalog-seed.json` · Cart/VAT spec: `docs/CART_SPEC.md` + `docs/fixtures/cart-vectors.json`
+- Data/fake API spec: `docs/FAKE_BACKEND.md` + `docs/fixtures/catalog-seed.json` · Cart/TVA spec: `docs/CART_SPEC.md` + `docs/fixtures/cart-vectors.json`
 - Copy (EN/AR): `docs/fixtures/copy.json` · Perf protocol: `docs/PERF_PLAN.md` · Results: `docs/PERF_LOG.md`
 - Skills (auto-load by topic): `.claude/skills/*` · Subagents: `.claude/agents/*` · Commands: `.claude/commands/*`
 - Gates: `scripts/check.sh` (`--quick` per commit, `--full` before ship) · Pattern linter: `scripts/lint-patterns.mjs`

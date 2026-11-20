@@ -98,7 +98,7 @@ We do not ship over-the-air updates (backend is out of scope, G-07). `expo-updat
 `brief/` is private and never committed, so a fresh clone cannot read `brief/BRIEF.md`. `scripts/brief-coverage.mjs` pins the ID count per section (G 10, H 4, C 3, P 3, K 4, F 10, D 8, S 8, L 1 = 51). When the brief is present it must match the pinned list exactly, or the check fails with `DRIFT`.
 
 ## ADR-028 UI copy uses Western digits in both languages — *Accepted*
-Saudi pharmacy and retail apps show prices and counts with Western digits (0–9) in Arabic too. One digit set keeps prices easy to compare and the money formatter simple. The catalog seed follows the same rule, so a product never reads "60 tablets" in one place and "٦٠ قرصاً" in another. Enforced by `tests/i18n.test.tsx` (no Eastern Arabic digits ٠–٩ in the copy) and `tests/catalog.test.ts` (none in the seed file or in any product's `nameAr`). The percent sign stays the Arabic ٪. Arabic proofreading by a native speaker is an open task in `docs/PLAN.md`.
+Algerian pharmacy and retail apps show prices and counts with Western digits (0–9) in Arabic too. One digit set keeps prices easy to compare and the money formatter simple. The catalog seed follows the same rule, so a product never reads "60 tablets" in one place and "٦٠ قرصاً" in another. Enforced by `tests/i18n.test.tsx` (no Eastern Arabic digits ٠–٩ in the copy) and `tests/catalog.test.ts` (none in the seed file or in any product's `nameAr`). The percent sign stays the Arabic ٪. Arabic proofreading by a native speaker is an open task in `docs/PLAN.md`.
 
 ## ADR-029 Count strings use CLDR plural categories — *Accepted (amends ADR-011)*
 Arabic has six plural forms (zero, one, two, few, many, other), so "{n} items" cannot be built by string concatenation. Count-dependent strings live under `plurals` in `docs/fixtures/copy.json`, one form per category; `tn(lang, key, n)` picks the form with a 10-line rule function. English may add a `zero` form ("No reviews yet"). Still no i18n library: the whole thing fits in one file that can be explained live.
@@ -421,8 +421,8 @@ The Arabic hint copy (`lang.toggleHint`) needs a native speaker's read; that is 
 **Context.** Checkout and payments were out of scope for the brief. The portfolio version adds ordering (still no payment) and must not let a client set its own prices.
 
 **Decision.**
-- **The server prices the order.** The client sends product ids and quantities only. `public.place_order` (`supabase/migrations/20261120000300_place_order.sql`) reads `products.price_h`, checks stock, computes VAT and writes the order and its lines in one transaction. Users cannot insert into `orders` directly (RLS).
-- **Same money rules on both sides.** Integer halalas; VAT is the 15% share of a VAT-inclusive price, `floor((6*gross+23)/46)` in SQL and `splitVat` in TypeScript, so the order total always equals the cart total.
+- **The server prices the order.** The client sends product ids and quantities only. `public.place_order` (`supabase/migrations/20261120000300_place_order.sql`) reads `products.price_h`, checks stock, computes TVA and writes the order and its lines in one transaction. Users cannot insert into `orders` directly (RLS).
+- **Same money rules on both sides.** Integer centimes; TVA is the 19% share of a TVA-inclusive price, `floor((38*gross+119)/238)` in SQL and `splitVat` in TypeScript, so the order total always equals the cart total. (Originally 15% VAT in halalas; replaced by ADR-061.)
 - **Typed failures.** Errors become a `CheckoutError` kind (signed out, out of stock, empty, network…), so the UI picks copy from the kind, never from a server string.
 - **Offline policy.** A build without keys can still place orders. They go to an in-memory fake (`offline-000001`…), vanish when the app closes, and the cart says so under the button. The whole cart → order → history flow is demoable on a fresh clone, and a fake order can never reach a server.
 - **History** reads `['orders', userId ?? 'offline']`, so a second account on the same phone never sees the first one's cached orders; checkout invalidates the `['orders']` prefix.
@@ -465,3 +465,18 @@ The Arabic hint copy (`lang.toggleHint`) needs a native speaker's read; that is 
 - **Offline Account tab** shows favourites and the in-memory order history under the "no backend" notice.
 
 **Verify-by.** `tests/cart.test.ts` (`removeOrdered`), `tests/cartStore.test.tsx`, `tests/checkout.test.tsx` (mid-request add survives; same id on retry; new id on a changed cart; sign-out on `signedOut`), `tests/ordersApi.test.ts` (rpc gets `request_id`; fake dedupe), `tests/favorites.test.tsx` (owner wipe/keep), `tests/accountScreen.test.tsx` (offline view, `applySession` owner cases). The SQL migration has **not been run** against a database yet (no Postgres on the build machine); it is checked by review only.
+
+## ADR-061 — Market: Algeria (DZD, TVA 19%) — *Accepted (amends ADR-057 money rules)*
+
+**Context.** The app started as a take-home for a Saudi pharmacy chain: prices in Saudi riyals, integer halalas, 15 % VAT, a Riyadh delivery chip. Nabd now targets Algeria, so the currency, the tax and the copy have to match an Algerian shop.
+
+**Decision.**
+- **Currency.** Algerian dinar (ISO DZD). Shown as `DA` in English and `د.ج` in Arabic, after the amount, Western digits, 2 decimals, `,` thousands (`formatDzd` in `src/i18n/format.ts`; was `formatSar`).
+- **Unit.** Money is integer **centimes** (1 DA = 100 centimes), replacing halalas. Renames: `toHalalas` → `toCentimes`, `Halalas` → `Centimes`, `formatSar` → `formatDzd`. The TVA field keeps its code name `vat` (`splitVat`, `VatSplit.vat`) to keep the diff small.
+- **Tax.** Prices include TVA at 19 % (replaces 15 % VAT). The TVA share of a TVA-inclusive gross is `round_half_up(gross × 19 / 119)`, computed with integers only as `tva = floor((38·gross + 119) / 238)`; `net = gross − tva`.
+- **Derivation.** For integers x ≥ 0, y > 0: round_half_up(x / y) = floor(x / y + 1/2) = floor((2x + y) / 2y). With x = 19·gross and y = 119 this gives floor((38·gross + 119) / 238). 19/119 does not reduce (119 = 7·17), so there is no smaller form like the old `floor((6·gross + 23) / 46)` for 3/23. A tie can never happen (38·gross is even, 119 is odd). Brute-force checked against a direct round-half-up for gross 0…2 000 000: 0 mismatches. The largest cart (1,000 lines × 99 × the top price) keeps 38·gross far below `Number.MAX_SAFE_INTEGER`.
+- **Database.** Columns keep their `*_h` names (`price_h`, `old_price_h`, `gross_h`, `vat_h`, `net_h`, `unit_price_h`, `line_total_h`, `price_min_h`, `price_max_h`) but now hold centimes; column comments say so. Renaming them would touch every query, RLS policy and the seed for no behavioural gain. `supabase/migrations/20261121000100_tva_19.sql` replaces `public.place_order` with the 19 % formula, so server and client totals still agree.
+- **Prices.** The catalog bands were rescaled about ×36 from SAR and rounded to whole dinars ending in 0 or 50 (for example Vitamins ≈ 900–6,800 DA), so shelf prices look like Algerian prices rather than converted ones. Exact bands: `docs/fixtures/catalog-seed.json`.
+- **Copy.** Free delivery over 4,000 DA (`FREE_DELIVERY_THRESHOLD_H = 400_000`). Location chip Algiers. Demo users have Algerian names.
+
+**Consequences.** Cart vectors, catalog determinism hashes, seed SQL and snapshot tests change with the rescale and the new formula. Already-stored orders in a database seeded before this migration hold halala amounts at 15 %; reseed rather than convert (demo data only). Performance numbers are unaffected by this change and are not re-stated here.

@@ -11,8 +11,8 @@
  *   5 adds 2). With nothing left to fit, the button says "Max 99 per item" and a press gives the
  *   warning haptic and announces the limit instead: no "Added", no flight, no success. This bar
  *   subscribes to its own cart line for that label: one product's line, never the whole cart.
- * - The button names what the press costs, "Add · 93.98 SAR": unit price x the stepper's quantity, in
- *   integer halalas, formatted only here at display. Tabular digits, so the label does not jitter.
+ * - The button names what the press costs, "Add · 3,300.00 DA": unit price x the stepper's quantity, in
+ *   integer centimes, formatted only here at display. Tabular digits, so the label does not jitter.
  * - Out of stock: no stepper, a disabled button that says so. It is dimmed once, by PressableScale's
  *   disabled opacity, on a neutral surface with full-strength text. The at-limit button stays
  *   pressable (no disabled opacity), so there the muted text is its one dim.
@@ -25,13 +25,13 @@ import Animated, { type AnimatedRef, type SharedValue } from 'react-native-reani
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Product } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import { PressableScale } from '@/design/PressableScale';
 import { Text } from '@/design/Text';
 import { makeStyles, useColors } from '@/design/theme';
 import { layout, radius, size, space } from '@/design/tokens';
 import { useDirection } from '@/i18n/direction';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { haptics } from '@/motion/haptics';
 import { useMotionPreference } from '@/motion/motionPreference';
@@ -88,7 +88,7 @@ export function AddToCartBar({ product, thumbUri, cartIconRef, cartCatch }: AddT
     play();
   };
 
-  const lineTotal = formatSar(toHalalas(product.price) * willAdd, lang);
+  const lineTotal = formatDzd(toCentimes(product.price) * willAdd, lang);
   const idleText = !inStock
     ? t('product.outOfStock')
     : atLimit

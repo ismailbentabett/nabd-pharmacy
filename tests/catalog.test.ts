@@ -1,7 +1,7 @@
 /**
  * The seeded catalog (D-01, D-02, D-06, D-08): identical on every run, and shaped like a real shelf.
  */
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import {
   CATEGORIES,
   discountPercent,
@@ -33,8 +33,8 @@ describe('determinism (D-01)', () => {
   });
 
   it('matches the pinned fingerprint (a changed generator must be a deliberate, reviewed change)', () => {
-    // Last changed when the Arabic names moved to Western digits (ADR-028); the English side is unchanged.
-    expect(fingerprint(products)).toBe('3e6baad7');
+    // Last changed when prices moved to whole Algerian dinars in 50 DA steps and the currency to DZD.
+    expect(fingerprint(products)).toBe('59e22f0f');
   });
 
   it('a different seed gives a different catalog', () => {
@@ -60,7 +60,7 @@ describe('shape (D-02)', () => {
 
   it('every product has the brief fields with sane values', () => {
     for (const p of products) {
-      expect(p.currency).toBe('SAR');
+      expect(p.currency).toBe('DZD');
       expect(p.name.length).toBeGreaterThan(0);
       expect(p.nameAr.length).toBeGreaterThan(0);
       expect(p.brand.length).toBeGreaterThan(0);
@@ -117,13 +117,13 @@ describe('categories (D-08)', () => {
 });
 
 describe('prices', () => {
-  it('stay inside the category band and end in .00 / .50 / .95 / .99', () => {
+  it('stay inside the category band and are whole dinars in steps of 50 DA', () => {
     for (const p of products) {
       const band = CATEGORIES.find((c) => c.id === p.category);
-      const priceH = toHalalas(p.price);
-      expect(priceH).toBeGreaterThanOrEqual(toHalalas(band?.priceMin ?? Number.NaN));
-      expect(priceH).toBeLessThanOrEqual(toHalalas(band?.priceMax ?? Number.NaN));
-      expect([0, 50, 95, 99]).toContain(priceH % 100);
+      const priceH = toCentimes(p.price);
+      expect(priceH).toBeGreaterThanOrEqual(toCentimes(band?.priceMin ?? Number.NaN));
+      expect(priceH).toBeLessThanOrEqual(toCentimes(band?.priceMax ?? Number.NaN));
+      expect(priceH % 5000).toBe(0);
       // The display float round-trips to the same integer: no 49.949999 prices.
       expect(priceH / 100).toBe(p.price);
     }
@@ -134,10 +134,10 @@ describe('prices', () => {
     expect(onOffer.length).toBeGreaterThan(300);
     expect(onOffer.length).toBeLessThan(400);
     for (const p of onOffer) {
-      const oldH = toHalalas(p.oldPrice ?? 0);
-      const priceH = toHalalas(p.price);
+      const oldH = toCentimes(p.oldPrice ?? 0);
+      const priceH = toCentimes(p.price);
       expect(oldH).toBeGreaterThan(priceH);
-      expect(oldH % 100).toBe(95);
+      expect(oldH % 5000).toBe(0);
       expect(discountPercent(p)).toBeGreaterThanOrEqual(5);
       expect(discountPercent(p)).toBeLessThanOrEqual(30);
     }

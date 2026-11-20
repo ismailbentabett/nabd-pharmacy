@@ -31,7 +31,7 @@ describe('the page shows the product (P-02)', () => {
 
     expect(screen.getByText(product.brand)).toBeTruthy();
     expect(screen.getByRole('header', { name: product.name })).toBeTruthy();
-    expect(screen.getByText('Prices include 15% VAT')).toBeTruthy();
+    expect(screen.getByText('Prices include 19% TVA')).toBeTruthy();
     expect(screen.getByText('In stock')).toBeTruthy();
     expect(screen.getByText('About this product')).toBeTruthy();
     expect(screen.getByText(product.descriptionEn)).toBeTruthy();

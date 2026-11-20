@@ -1,8 +1,8 @@
 /**
  * Cart logic as a pure reducer (docs/CART_SPEC.md). The zustand store only wraps this, so every rule
- * here is unit-tested without React. Money is integer halalas; prices are looked up, never copied.
+ * here is unit-tested without React. Money is integer centimes; prices are looked up, never copied.
  */
-import { splitVat, type Halalas, type VatSplit } from '@/core/money';
+import { splitVat, type Centimes, type VatSplit } from '@/core/money';
 
 export const MAX_QTY = 99;
 
@@ -139,10 +139,10 @@ export function selectLine(state: CartState, id: string): CartLine | undefined {
 }
 
 /**
- * Total is the sum of VAT-inclusive prices; the VAT share and the subtotal are derived from it once,
+ * Total is the sum of TVA-inclusive prices; the TVA share and the subtotal are derived from it once,
  * on the total, so rounding happens a single time (K-04).
  */
-export function selectTotals(state: CartState, lookupPriceH: (id: string) => Halalas | undefined): VatSplit {
+export function selectTotals(state: CartState, lookupPriceH: (id: string) => Centimes | undefined): VatSplit {
   let gross = 0;
   for (const id of state.ids) {
     const line = state.byId[id];

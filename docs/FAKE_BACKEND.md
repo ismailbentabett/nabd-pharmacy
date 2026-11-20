@@ -4,7 +4,7 @@
 - PRNG: **mulberry32(seed=20261116)** — never `Math.random()` anywhere in catalog/api code paths that must be deterministic.
 - Ids `p-0001…p-1000`. Category = `categories[(i-1) % 8]` shuffled once with the seeded RNG so neighbours differ (grid looks varied, still deterministic). Exactly 125 per category.
 - Each category has ≥ 12 **name templates** (EN+AR) × brand pool × variant pool (size/strength/pack). Names are composed, e.g. `${brand} ${type} ${variantEn}` / `${brandAr} ${typeAr} ${variantAr}` — see `docs/fixtures/catalog-seed.json`. Fictional brands only. No duplicates of full `name` within a category (retry/vary with seeded pick).
-- Price (SAR, 2 decimals): category band, e.g. Vitamins 24.95–189.00, Skincare 29.00–259.00, Baby care 12.50–149.00, Personal care 8.95–99.00, Medicines (OTC) 5.50–79.00, Hair care 15.00–139.00, Fitness 39.00–349.00, Fragrance 79.00–689.00. Prices end in .00/.50/.95/.99 weighted.
+- Price (DA, TVA included, stored as integer centimes): category band, roughly the original SAR bands ×36, e.g. Vitamins 900–6,800, Skincare 1,050–9,300, Baby care 450–5,350, Personal care 300–3,550, Medicines (OTC) 200–2,850, Hair care 550–5,000, Fitness 1,400–12,550, Fragrance 2,850–24,800. Prices are whole dinars ending in 0 or 50 (ADR-061). The exact bands live in `docs/fixtures/catalog-seed.json`.
 - `oldPrice`: ~35 % of products, 10–40 % above price; UI shows discount % = `round((1−price/oldPrice)*100)`.
 - `rating` 3.4–4.9 (1 decimal, skewed up), `reviews` 0–2 400 (log-skewed), `inStock` ~92 % true.
 - `images`: 3 per product: `https://picsum.photos/seed/${id}-${n}/${w}/${h}` n∈{1,2,3}. **Helper `imageUri(id,n,displayPx)`** buckets `w=h` to {160,240,320,480,640,800} ≥ displayPx×DPR (cap 800 for hero). Never request 800 for a tile.

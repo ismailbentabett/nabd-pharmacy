@@ -11,9 +11,12 @@ import type { CategoryId, Product } from './types';
 
 const CATEGORY_SHUFFLE_SALT = 0x0c47;
 
-/** Cents part of a price, and how often each one appears. Real shelves mostly end in .95 / .00. */
-const PRICE_ENDINGS = [0, 50, 95, 99] as const;
-const PRICE_ENDING_WEIGHTS = [3, 2, 3, 2] as const;
+/** Last two digits of a dinar price, and how often each one appears. Algerian shelves round to 50 DA. */
+const PRICE_ENDINGS = [0, 50] as const;
+const PRICE_ENDING_WEIGHTS = [3, 2] as const;
+
+/** Every catalog price is a whole multiple of this many dinars. */
+const PRICE_STEP_DA = 50;
 
 const SKU_PREFIX: Record<CategoryId, string> = {
   vitamins: 'VIT',
@@ -30,23 +33,27 @@ export function productId(index: number): string {
   return `p-${String(index).padStart(4, '0')}`;
 }
 
-/** Price in halalas inside the category band, skewed towards the cheaper end like a real shelf. */
-function drawPriceHalalas(rng: Rng, minSar: number, maxSar: number): number {
+/**
+ * Price in centimes inside the category band (whole dinars, a multiple of 50 DA), skewed towards the
+ * cheaper end like a real shelf. The band edges are multiples of 50 DA too, so clamping keeps the step.
+ */
+function drawPriceCentimes(rng: Rng, minDa: number, maxDa: number): number {
   const skewed = Math.pow(rng(), 1.6);
-  const whole = Math.floor(minSar + skewed * (maxSar - minSar));
+  const whole = Math.floor(minDa + skewed * (maxDa - minDa));
   const ending = pickWeighted(rng, PRICE_ENDINGS, PRICE_ENDING_WEIGHTS);
-  let priceH = whole * 100 + ending;
-  const minH = Math.round(minSar * 100);
-  const maxH = Math.round(maxSar * 100);
-  if (priceH < minH) priceH = minH;
-  if (priceH > maxH) priceH = (whole - 1) * 100 + ending;
-  return priceH;
+  const da = Math.min(maxDa, Math.max(minDa, Math.floor(whole / 100) * 100 + ending));
+  return da * 100;
 }
 
-/** Old price 10–40 % above the price, always ending in .95. */
-function drawOldPriceHalalas(rng: Rng, priceH: number): number {
+/**
+ * Old price 10–40 % above the price, rounded down to a 50 DA step (so it never adds to the discount),
+ * and always at least one 50 DA step above the price.
+ */
+function drawOldPriceCentimes(rng: Rng, priceH: number): number {
   const factor = randFloat(rng, 1.1, 1.4);
-  return Math.ceil((priceH * factor) / 100) * 100 - 5;
+  const priceDa = priceH / 100;
+  const oldDa = Math.floor((priceDa * factor) / PRICE_STEP_DA) * PRICE_STEP_DA;
+  return Math.max(oldDa, priceDa + PRICE_STEP_DA) * 100;
 }
 
 /** Pale, low-saturation colour for the image placeholder (HSL → hex, built at runtime). */
@@ -116,9 +123,9 @@ export function generateCatalog(seed: CatalogSeed = SEED): Product[] {
     const name = `${brand.en} ${type[0]} ${variant[0]}`;
     used.add(name);
 
-    const priceH = drawPriceHalalas(rng, band.priceMin, band.priceMax);
+    const priceH = drawPriceCentimes(rng, band.priceMin, band.priceMax);
     const onOffer = rng() < 0.35;
-    const oldPriceH = onOffer ? drawOldPriceHalalas(rng, priceH) : null;
+    const oldPriceH = onOffer ? drawOldPriceCentimes(rng, priceH) : null;
     const rating = Math.min(4.9, Math.round((3.4 + 1.5 * Math.sqrt(rng())) * 10) / 10);
     const reviews = Math.floor(Math.exp(rng() * Math.log(2401))) - 1;
     const inStock = rng() < 0.92;
@@ -133,7 +140,7 @@ export function generateCatalog(seed: CatalogSeed = SEED): Product[] {
       category,
       price: priceH / 100,
       oldPrice: oldPriceH === null ? null : oldPriceH / 100,
-      currency: 'SAR',
+      currency: 'DZD',
       rating,
       reviews,
       inStock,

@@ -182,7 +182,7 @@ describe('Home renders its sections', () => {
     const search = screen.getByTestId(testIds.homeSearch);
     expect(search.props.accessibilityRole).toBe('button');
     expect(search.props.accessibilityLabel).toBe('Search medicines, vitamins, skincare…');
-    expect(screen.getByLabelText('Deliver to Riyadh')).toBeTruthy();
+    expect(screen.getByLabelText('Deliver to Algiers')).toBeTruthy();
     expect(screen.getByTestId(testIds.homeSeeAll).props.accessibilityLabel).toBe('See all, Shop by category');
 
     const banner = screen.getByTestId(testIds.homeBanner);

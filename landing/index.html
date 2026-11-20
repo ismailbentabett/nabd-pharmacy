@@ -1,362 +1,434 @@
 <!doctype html>
+<!--
+  Design plan
+
+  Palette
+    pine      #0E3B35  hero, run block, phone bezel, primary text accents
+    pine-deep #082824  bezel edge, code background on pine
+    lime      #C8F169  the pulse line, primary button, focus ring on pine
+    paper     #F4F6F3  page background (the app's own light background)
+    ink       #10231F  body text
+    moss      #4D615C  secondary text (passes 4.5:1 on paper)
+    rule      #D7DFDA  hairlines
+
+  Type
+    IBM Plex Sans for everything Latin, IBM Plex Sans Arabic for Arabic, IBM Plex Mono only inside code.
+    Scale (ratio ~1.333): 15 / 17 / 22 / 30 / 40 / clamp(72..168) for the wordmark.
+    The wordmark is the one big typographic moment; headings elsewhere stay at 30-40px, weight 600.
+
+  Layout
+    Hero (pine, full bleed):
+      Nabd                     [home EN] [home AR]
+      نبض
+      ______/\/\______  pulse line draws once
+      one sentence
+      [View the code] [See the screens]
+
+    Screens (the bold idea, a sticky scrollytelling phone):
+      +---------------------------+---------------+
+      | Home panel   (100vh)      |  EN | عربي    |
+      | Category panel            |  Light | Dark |
+      | Product panel             |  [ phone ]    |  sticky, cross-fades per panel
+      | Cart panel                |  caption      |
+      +---------------------------+---------------+
+      <= 760px: toggles stick to the top, each panel shows its screenshot inline.
+
+    Receipt: text left, a live receipt right (quantities change, TVA recomputed in integer centimes).
+    How it's built: a plain definition list with hairlines, not a card grid.
+    Run: one pine block with the four commands. Footer.
+    All text left aligned (start aligned), Arabic runs right aligned via dir="rtl".
+
+  Principles
+    The real app does the talking: every image on the page is a real capture, nothing is mocked in CSS.
+    Spend the boldness on the sticky phone; everything around it is quiet.
+    Only real numbers: 1,000 products, 4 screens, 19% TVA, pages of 20.
+    One load animation (the pulse line). The only other motion answers scroll or a click.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nabd Pharmacy</title>
-<meta name="description" content="Nabd (نبض) is a bilingual pharmacy shopping app for Android, built with React Native. Gesture-driven motion, full Arabic RTL, a 1,000-product grid and a VAT-correct cart.">
+<meta name="description" content="Nabd (نبض) is a bilingual English and Arabic pharmacy shopping app built with React Native: four screens, a 1,000-product grid, a shared-element transition and a cart that shows 19% TVA on its own line, priced in Algerian dinars.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --pine: #0E3B35;
-    --pine-2: #15524A;
+    --pine-deep: #082824;
+    --pine-soft: #1A4C45;
     --lime: #C8F169;
-    --bg: #F4F6F3;
+    --paper: #F4F6F3;
     --surface: #FFFFFF;
-    --ink: #0B1F1C;
-    --muted: #4F625E;
-    --line: #DCE3DF;
-    --radius: 20px;
+    --ink: #10231F;
+    --moss: #4D615C;
+    --rule: #D7DFDA;
+    --focus: var(--pine);
+    --gutter: 24px;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0A1714; --surface: #10221E; --ink: #EAF1EE; --muted: #9DB1AB; --line: #1F3631;
-    }
-  }
-  :root[data-theme="dark"] { --bg: #0A1714; --surface: #10221E; --ink: #EAF1EE; --muted: #9DB1AB; --line: #1F3631; }
-
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
-  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; height: auto; }
   a { color: inherit; }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-  .ar { font-family: "IBM Plex Sans Arabic", sans-serif; }
-  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  [lang="ar"] { font-family: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+  .on-pine { --focus: var(--lime); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
+  .skip { position: absolute; left: -9999px; top: 8px; background: var(--lime); color: var(--pine); padding: 10px 16px; border-radius: 8px; z-index: 50; font-weight: 600; }
+  .skip:focus { left: 8px; }
 
-  /* Nav */
-  nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
-  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; text-decoration: none; letter-spacing: -0.01em; }
-  .brand img { width: 32px; height: 32px; border-radius: 9px; }
-  .brand .ar { font-weight: 600; color: var(--muted); font-size: 17px; }
-  nav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; font-size: 15px; font-weight: 500; }
-  nav ul a { text-decoration: none; color: var(--muted); }
-  nav ul a:hover { color: var(--ink); }
-  @media (max-width: 720px) { nav ul { display: none; } }
+  h2 { font-size: clamp(30px, 3.4vw, 40px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; margin: 0 0 16px; max-width: 20ch; }
+  h3 { font-size: 22px; line-height: 1.25; letter-spacing: -0.01em; font-weight: 600; margin: 0 0 10px; }
+  p { margin: 0 0 16px; }
+  .lead { color: var(--moss); max-width: 58ch; }
 
-  /* Hero */
-  .hero { background: var(--pine); color: #fff; overflow: hidden; }
-  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding-top: 88px; padding-bottom: 88px; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lime); }
-  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lime); }
-  h1 { font-size: clamp(40px, 6vw, 68px); line-height: 1.02; letter-spacing: -0.03em; margin: 18px 0 20px; font-weight: 700; }
-  h1 em { font-style: normal; color: var(--lime); }
-  .lede { font-size: 19px; color: #C9DAD5; max-width: 34em; margin: 0 0 32px; }
-  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform .12s ease, background-color .12s ease; }
-  .btn:active { transform: scale(0.97); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    min-height: 52px; padding: 0 26px; border-radius: 999px;
+    font: 600 16px/1 "IBM Plex Sans", sans-serif; text-decoration: none;
+    transition: transform .12s ease, background-color .15s ease;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn svg { width: 20px; height: 20px; flex: none; }
   .btn-lime { background: var(--lime); color: var(--pine); }
-  .btn-lime:hover { background: #D6F68A; }
-  .btn-ghost { border: 1.5px solid #3C6B63; color: #fff; }
-  .btn-ghost:hover { background: var(--pine-2); }
-  .hero-ar { margin-top: 28px; font-size: 18px; color: #9FC2B9; }
+  .btn-lime:hover { background: #D7F78E; }
+  .btn-line { color: #fff; box-shadow: inset 0 0 0 1.5px #4C7A72; }
+  .btn-line:hover { background: var(--pine-soft); }
 
-  /* Phone */
-  .phone { justify-self: center; width: 300px; aspect-ratio: 9 / 19.5; border-radius: 44px; background: #061B18; padding: 12px; box-shadow: 0 0 0 1px #24534B inset; }
-  .screen { width: 100%; height: 100%; border-radius: 34px; background: #F4F6F3; overflow: hidden; display: flex; flex-direction: column; color: #0B1F1C; }
-  .s-head { background: var(--pine); padding: 30px 16px 14px; }
-  .s-hello { color: #C9DAD5; font-size: 12px; }
-  .s-title { color: #fff; font-weight: 700; font-size: 17px; margin: 2px 0 12px; }
-  .s-search { background: #fff; border-radius: 12px; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 12px; color: #6B7C78; font-size: 13px; }
-  .s-banner { margin: 14px 14px 0; height: 92px; border-radius: 16px; background: var(--lime); position: relative; padding: 14px; overflow: hidden; }
-  .s-banner b { display: block; color: var(--pine); font-size: 15px; }
-  .s-banner span { color: var(--pine); font-size: 11px; opacity: .8; }
-  .s-banner svg { position: absolute; right: -6px; bottom: -8px; width: 110px; opacity: .35; }
-  .s-dots { display: flex; gap: 5px; justify-content: center; margin: 9px 0 2px; }
-  .s-dots i { width: 6px; height: 6px; border-radius: 3px; background: #C2CCC8; }
-  .s-dots i:first-child { width: 16px; background: var(--pine); }
-  .s-chips { display: flex; gap: 8px; padding: 10px 14px; overflow: hidden; }
-  .s-chips span { flex: none; font-size: 11px; font-weight: 600; padding: 6px 11px; border-radius: 999px; background: #fff; border: 1px solid #DCE3DF; }
-  .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 14px; flex: 1; }
-  .s-card { background: #fff; border-radius: 14px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
-  .s-img { aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; }
-  .s-name { font-size: 10.5px; font-weight: 600; line-height: 1.25; }
-  .s-price { font-size: 11px; font-weight: 700; color: var(--pine); }
-  .s-tabs { display: flex; justify-content: space-around; padding: 10px 6px 16px; background: #fff; border-top: 1px solid #E5EBE8; font-size: 9.5px; color: #6B7C78; }
-  .s-tabs div { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
-  .s-tabs div.on { color: var(--pine); font-weight: 700; }
-  .s-tabs svg { width: 18px; height: 18px; }
-  .badge { position: absolute; top: -5px; right: -8px; background: var(--lime); color: var(--pine); font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; border-radius: 8px; display: grid; place-items: center; animation: bump 3.2s ease-in-out infinite; }
-  @keyframes bump { 0%, 82%, 100% { transform: scale(1); } 88% { transform: scale(1.35); } 94% { transform: scale(0.92); } }
+  /* ---------- Hero ---------- */
+  .hero { background: var(--pine); color: #fff; overflow: hidden; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 18px; }
+  .brand img { width: 34px; height: 34px; border-radius: 50%; }
+  .topbar a.gh { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 4px; text-decoration: none; color: #CFE0DB; font-weight: 500; font-size: 15px; }
+  .topbar a.gh:hover { color: #fff; }
+  .topbar a.gh svg { width: 20px; height: 20px; }
 
-  @media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; padding-top: 56px; padding-bottom: 64px; } .phone { width: 260px; } }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 56px; align-items: center; padding: 40px 0 96px; }
+  .wordmark { margin: 0; font-weight: 700; line-height: .9; letter-spacing: -0.045em; font-size: clamp(76px, 13vw, 176px); }
+  .wordmark span { display: block; }
+  .wordmark .ar { color: var(--lime); letter-spacing: 0; line-height: 1.15; font-size: .86em; margin-top: .06em; }
+  .pulse { display: block; width: 100%; max-width: 620px; height: auto; margin: 18px 0 30px; overflow: visible; }
+  .pulse path { fill: none; stroke: var(--lime); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.8s cubic-bezier(.55, .1, .25, 1) .25s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .hero-text { font-size: 20px; line-height: 1.5; color: #D5E4DF; max-width: 34ch; margin: 0 0 32px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
 
-  /* Sections */
-  section { padding: 96px 0; }
-  .kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
-  h2 { font-size: clamp(30px, 4vw, 44px); line-height: 1.08; letter-spacing: -0.025em; margin: 0 0 16px; max-width: 18em; }
-  .sub { color: var(--muted); max-width: 40em; margin: 0 0 48px; font-size: 18px; }
+  .hero-shots { position: relative; width: 470px; height: 560px; }
+  .hero-shots figure { margin: 0; position: absolute; width: 250px; }
+  .hero-shots .back { inset-inline-end: 0; top: 0; }
+  .hero-shots .front { inset-inline-start: 0; top: 56px; }
+  .bezel { border-radius: 38px; padding: 9px; background: var(--pine-deep); box-shadow: 0 0 0 1px #2A5A52; }
+  .bezel img { border-radius: 30px; width: 100%; aspect-ratio: 412 / 892; object-fit: cover; background: #E6ECE9; }
+  .hero-shots figcaption { font-size: 14px; color: #A9C4BC; margin-top: 12px; padding-inline-start: 6px; }
 
-  .screens { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .screen-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
-  .screen-card .num { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
-  .screen-card h3 { margin: 10px 0 12px; font-size: 22px; letter-spacing: -0.01em; }
-  .screen-card ul { margin: 0; padding: 0 0 0 18px; color: var(--muted); font-size: 15px; }
-  .screen-card li { margin: 6px 0; }
-  @media (max-width: 960px) { .screens { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .screens { grid-template-columns: 1fr; } }
+  /* ---------- Tour ---------- */
+  .tour-intro { padding: 112px 0 8px; }
+  .tour { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 64px; }
+  .panel { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; padding: 48px 0; max-width: 520px; opacity: .45; transition: opacity .35s ease; }
+  .panel.is-active { opacity: 1; }
+  .panel h3 { font-size: 30px; letter-spacing: -0.02em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; }
+  .panel h3 [lang="ar"] { font-size: 22px; font-weight: 600; color: var(--moss); letter-spacing: 0; }
+  .panel ul { margin: 6px 0 0; padding: 0; list-style: none; color: var(--moss); }
+  .panel li { padding: 12px 0; border-top: 1px solid var(--rule); }
+  .panel li:last-child { border-bottom: 1px solid var(--rule); }
+  .panel li b { color: var(--ink); font-weight: 600; }
+  .inline-shot { display: none; }
 
-  .motion { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .feat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 32px; }
-  .feat .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--pine); color: var(--lime); display: grid; place-items: center; margin-bottom: 16px; }
-  .feat .ic svg { width: 22px; height: 22px; }
-  .feat h3 { font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
-  .feat p { margin: 0; color: var(--muted); font-size: 15.5px; }
-  @media (max-width: 860px) { .feat { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .feat { grid-template-columns: 1fr; } }
+  .stage { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .seg { display: inline-flex; padding: 4px; border-radius: 999px; background: #E4EAE6; }
+  .seg button {
+    min-height: 44px; min-width: 64px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent;
+    font: 600 15px/1 "IBM Plex Sans", sans-serif; color: var(--moss); cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .seg button[lang="ar"] { font-family: "IBM Plex Sans Arabic", sans-serif; }
+  .seg button[aria-pressed="true"] { background: var(--pine); color: #fff; }
+  .seg button:not([aria-pressed="true"]):hover { color: var(--ink); }
+  .phone { position: relative; height: min(640px, calc(100vh - 210px)); aspect-ratio: 412 / 892; border-radius: 44px; padding: 10px; background: var(--pine-deep); box-shadow: 0 0 0 1px #2A5A52, 0 30px 60px -30px rgba(14, 59, 53, .45); }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 35px; overflow: hidden; background: #E6ECE9; }
+  .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .45s ease; }
+  .screen img.on { opacity: 1; }
+  .caption { font-size: 14px; color: var(--moss); text-align: center; min-height: 44px; max-width: 34ch; margin: 0; line-height: 1.5; }
 
-  /* RTL split */
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .lang { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
-  .lang .tag { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .row { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 14px; border-radius: 14px; background: var(--bg); }
-  .row .thumb { width: 56px; height: 56px; border-radius: 10px; flex: none; background-size: cover; background-position: center; }
-  .row .meta { flex: 1; min-width: 0; }
-  .row .meta b { display: block; font-size: 15px; }
-  .row .meta span { color: var(--muted); font-size: 14px; }
-  .row .swipe { font-size: 13px; color: var(--pine); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  :root[data-theme="dark"] .row .swipe { color: var(--lime); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .row .swipe { color: var(--lime); } }
-  .row .swipe svg { width: 16px; height: 16px; }
-  .lang[dir="rtl"] { font-family: "IBM Plex Sans Arabic", sans-serif; }
-  .lang[dir="rtl"] .swipe svg { transform: scaleX(-1); }
-  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+  /* ---------- Receipt ---------- */
+  .tva { padding: 120px 0; }
+  .tva-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 72px; align-items: start; }
+  pre.code { margin: 24px 0 0; padding: 20px 22px; border-radius: 16px; background: var(--pine); color: #DCEBE6; font: 400 15px/1.75 "IBM Plex Mono", ui-monospace, monospace; overflow-x: auto; }
+  pre.code .k { color: var(--lime); }
+  .receipt { background: var(--surface); border-radius: 24px; padding: 8px 28px 28px; box-shadow: 0 0 0 1px var(--rule); }
+  .item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .item .name { grid-column: 1 / -1; font-weight: 600; line-height: 1.35; }
+  .item .name small { display: block; font-weight: 400; color: var(--moss); font-size: 15px; margin-top: 2px; }
+  .step { display: inline-flex; align-items: center; border-radius: 999px; background: #EAF0EC; }
+  .step button { width: 48px; height: 48px; border: 0; background: transparent; border-radius: 50%; color: var(--pine); cursor: pointer; display: grid; place-items: center; }
+  .step button:hover:not(:disabled) { background: #DCE5E0; }
+  .step button:disabled { color: #A3B2AE; cursor: default; }
+  .step button svg { width: 18px; height: 18px; }
+  .step output { min-width: 28px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .item .line { font-weight: 600; font-variant-numeric: tabular-nums; text-align: end; }
+  .sums { margin: 20px 0 0; }
+  .sums div { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-variant-numeric: tabular-nums; }
+  .sums dt { color: var(--moss); }
+  .sums dd { margin: 0; font-weight: 500; }
+  .sums .total { border-top: 1px solid var(--rule); margin-top: 10px; padding-top: 16px; font-size: 22px; font-weight: 700; }
+  .sums .total dt { color: var(--ink); }
+  .sums .total dd { font-weight: 700; }
+  .receipt-note { font-size: 14px; color: var(--moss); margin: 16px 0 0; }
 
-  /* Cart math */
-  .cart { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-  .receipt { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; font-size: 16px; }
-  .receipt .line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--line); }
-  .receipt .line:last-child { border-bottom: 0; font-weight: 700; font-size: 19px; padding-top: 14px; }
-  .receipt .line span:last-child { font-family: "IBM Plex Mono", monospace; }
-  code.blk { display: block; background: var(--pine); color: #DDEBE6; border-radius: 14px; padding: 18px 20px; font-family: "IBM Plex Mono", monospace; font-size: 14.5px; line-height: 1.7; overflow-x: auto; white-space: pre; }
-  code.blk .k { color: var(--lime); }
-  @media (max-width: 860px) { .cart { grid-template-columns: 1fr; } }
+  /* ---------- Built ---------- */
+  .built { padding: 0 0 120px; }
+  .built dl { margin: 40px 0 0; border-top: 1px solid var(--rule); }
+  .built dl > div { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; padding: 28px 0; border-bottom: 1px solid var(--rule); }
+  .built dt { font-weight: 600; font-size: 19px; line-height: 1.35; }
+  .built dd { margin: 0; color: var(--moss); max-width: 64ch; }
+  .built dd b { color: var(--ink); font-weight: 600; }
 
-  /* Stack */
-  .stack { display: flex; flex-wrap: wrap; gap: 10px; }
-  .stack span { padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 15px; font-weight: 500; }
-
-  /* Run */
-  .run { background: var(--pine); color: #fff; border-radius: 28px; padding: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  /* ---------- Run ---------- */
+  .run { background: var(--pine); color: #fff; border-radius: 32px; padding: 64px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.3fr); gap: 48px; align-items: center; }
   .run h2 { color: #fff; }
-  .run p { color: #C9DAD5; margin: 0; }
-  .run code.blk { background: #061B18; }
-  @media (max-width: 860px) { .run { grid-template-columns: 1fr; padding: 32px 24px; } }
+  .run p { color: #CFE0DB; max-width: 40ch; }
+  .run pre.code { margin: 0; background: var(--pine-deep); }
+  .run .btn { margin-top: 8px; }
 
-  footer { padding: 40px 0 56px; color: var(--muted); font-size: 14px; }
-  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; }
+  footer { padding: 56px 0 64px; color: var(--moss); font-size: 15px; }
+  footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+  footer .brand { color: var(--ink); }
+  footer .brand img { width: 30px; height: 30px; }
+  footer a.plain { min-height: 48px; display: inline-flex; align-items: center; }
 
-  @media (max-width: 480px) { .wrap { padding: 0 16px; } section { padding: 64px 0; } }
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1040px) {
+    .hero-shots { width: 380px; height: 470px; }
+    .hero-shots figure { width: 205px; }
+    .tour { grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; }
+    .tva-grid { grid-template-columns: 1fr; gap: 40px; }
+    .run { grid-template-columns: 1fr; padding: 48px 40px; }
+    .built dl > div { grid-template-columns: 220px minmax(0, 1fr); }
+  }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 48px; padding-bottom: 72px; }
+    .hero-shots { width: 100%; max-width: 440px; height: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .hero-shots figure { position: static; width: auto; }
+    .hero-shots .front { order: -1; }
+  }
+  @media (max-width: 760px) {
+    :root { --gutter: 16px; }
+    .tour-intro { padding: 80px 0 0; }
+    .tour { display: block; }
+    .stage { position: sticky; top: 0; z-index: 5; height: auto; padding: 10px 0; background: var(--paper); box-shadow: 0 1px 0 var(--rule); flex-direction: row; justify-content: flex-start; }
+    .phone, .caption { display: none; }
+    .controls { justify-content: flex-start; }
+    .seg button { min-width: 56px; padding: 0 12px; }
+    .panel { min-height: 0; opacity: 1; padding: 48px 0 8px; max-width: none; }
+    .inline-shot { display: block; width: min(300px, 82%); margin: 24px 0 0; }
+    .inline-shot img { border-radius: 30px; aspect-ratio: 412 / 892; object-fit: cover; background: #E6ECE9; }
+    .tva { padding: 88px 0; }
+    .receipt { padding: 4px 18px 22px; }
+    .built { padding-bottom: 88px; }
+    .built dl > div { grid-template-columns: 1fr; gap: 6px; padding: 22px 0; }
+    .run { padding: 36px 20px; border-radius: 24px; }
+    pre.code { font-size: 13px; padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .hero-text { font-size: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .pulse path { animation: none; stroke-dashoffset: 0; }
+    .screen img, .panel, .btn, .seg button { transition: none; }
+  }
 </style>
 </head>
 <body>
+<a class="skip" href="#screens">Skip to the screens</a>
 
-<nav aria-label="Main">
+<header class="hero on-pine">
   <div class="wrap">
-    <a class="brand" href="#top"><img src="icon.svg" alt="" width="32" height="32">Nabd <span class="ar" lang="ar">نبض</span></a>
-    <ul>
-      <li><a href="#screens">Screens</a></li>
-      <li><a href="#motion">Motion</a></li>
-      <li><a href="#rtl">Arabic</a></li>
-      <li><a href="#cart">Cart</a></li>
-      <li><a href="#run">Run it</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <div class="wrap">
-    <div>
-      <span class="eyebrow">React Native · Android first</span>
-      <h1>A pharmacy app that <em>moves</em> like it was built to.</h1>
-      <p class="lede">Nabd is a bilingual pharmacy shop: vitamins, skincare, baby care and medicines in a 1,000-product catalogue. Every gesture tracks the finger on the UI thread, and switching to Arabic flips the whole app, swipes and transitions included.</p>
-      <div class="cta">
-        <a class="btn btn-lime" href="#run">Run it locally</a>
-        <a class="btn btn-ghost" href="#motion">How it moves</a>
-      </div>
-      <p class="hero-ar ar" lang="ar" dir="rtl">صيدلية بلغتين، تتحرك بسلاسة، من اليمين إلى اليسار بالكامل.</p>
+    <div class="topbar">
+      <a class="brand" href="#top" aria-label="Nabd, back to top"><img src="icon.svg" alt="" width="34" height="34">Nabd</a>
+      <a class="gh" href="https://github.com/ismailbentabett/nabd-pharmacy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+        GitHub
+      </a>
     </div>
 
-    <div class="phone" aria-label="Illustration of the Nabd home screen" role="img">
-      <div class="screen">
-        <div class="s-head">
-          <div class="s-hello">Good evening</div>
-          <div class="s-title">What do you need today?</div>
-          <div class="s-search">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            Search vitamins, brands…
-          </div>
+    <div class="hero-grid" id="top">
+      <div>
+        <h1 class="wordmark"><span>Nabd</span><span class="ar" lang="ar" dir="rtl">نبض</span></h1>
+        <svg class="pulse" viewBox="0 20 620 60" aria-hidden="true" focusable="false">
+          <path pathLength="1" d="M2 53 L250 53 L262 43 L274 69 L292 29 L306 59 L314 53 L618 53"/>
+        </svg>
+        <p class="hero-text">A pharmacy shopping app in English and Arabic, built in React Native, where switching language mirrors the whole app, swipes and transitions included.</p>
+        <div class="ctas">
+          <a class="btn btn-lime" href="https://github.com/ismailbentabett/nabd-pharmacy">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+            View the code
+          </a>
+          <a class="btn btn-line" href="#screens">See the screens</a>
         </div>
-        <div class="s-banner">
-          <b>Winter immunity</b>
-          <span>Vitamin C, zinc and D3</span>
-          <svg viewBox="0 0 100 100" fill="none"><path d="M21 53 L35 53 L41 43 L47 69 L56 29 L63 59 L67 53 L79 53" stroke="#0E3B35" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="s-dots"><i></i><i></i><i></i><i></i></div>
-        <div class="s-chips"><span>Vitamins</span><span>Skincare</span><span>Baby care</span><span>Hair care</span></div>
-        <div class="s-grid">
-          <div class="s-card"><div class="s-img" style="background-image:url('https://picsum.photos/seed/p-0007-1/200/200')"></div><div class="s-name">Vitamin D3 1000 IU</div><div class="s-price">SAR 39.00</div></div>
-          <div class="s-card"><div class="s-img" style="background-image:url('https://picsum.photos/seed/p-0042-1/200/200')"></div><div class="s-name">Hydrating Cleanser</div><div class="s-price">SAR 54.50</div></div>
-        </div>
-        <div class="s-tabs">
-          <div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
-          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Shop</div>
-          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="badge">3</span>Cart</div>
-          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Account</div>
-        </div>
+      </div>
+
+      <div class="hero-shots">
+        <figure class="back">
+          <div class="bezel"><img src="shots/home-ar-light.jpg" width="680" height="1472" alt="The Nabd home screen in Arabic: right-to-left layout with the search bar, a skincare banner and the category rail starting from the right."></div>
+          <figcaption lang="ar" dir="rtl">الرئيسية بالعربية</figcaption>
+        </figure>
+        <figure class="front">
+          <div class="bezel"><img src="shots/home-en-light.jpg" width="680" height="1472" alt="The Nabd home screen in English: a pine header with a delivery address in Algiers and search, a summer skincare banner, a category rail and best sellers."></div>
+          <figcaption>Home in English</figcaption>
+        </figure>
       </div>
     </div>
   </div>
 </header>
 
 <main>
-  <section id="screens">
+  <section id="screens" aria-labelledby="screens-title">
     <div class="wrap">
-      <p class="kicker">The app</p>
-      <h2>Four shopping screens, plus search and an account.</h2>
-      <p class="sub">Every screen has designed loading, empty and error states, a reduced-motion variant and labels for TalkBack.</p>
-      <div class="screens">
-        <article class="screen-card">
-          <span class="num">01</span><h3>Home</h3>
-          <ul><li>Search header that collapses into a compact bar as you scroll</li><li>Auto-playing banner carousel that pauses while touched</li><li>Category and best-seller rails</li></ul>
-        </article>
-        <article class="screen-card">
-          <span class="num">02</span><h3>Category</h3>
-          <ul><li>Two-column grid of 1,000 products on FlashList v2</li><li>Images fade in once from a colour placeholder, no flicker on the way back</li><li>Filter and sort sheet that follows the finger and snaps</li></ul>
-        </article>
-        <article class="screen-card">
-          <span class="num">03</span><h3>Product</h3>
-          <ul><li>Shared-element transition: the tile image grows into the gallery</li><li>Swipeable gallery with a page indicator</li><li>Add to cart that bumps the badge, and a synced favourite heart</li></ul>
-        </article>
-        <article class="screen-card">
-          <span class="num">04</span><h3>Cart</h3>
-          <ul><li>Items animate in and out; the list closes the gap</li><li>Swipe to delete, with undo</li><li>Quantity stepper, 15% VAT line, total in SAR, checkout</li></ul>
-        </article>
+      <div class="tour-intro">
+        <h2 id="screens-title">Four screens, captured from the running app.</h2>
+        <p class="lead">Scroll through them. Switch the language or the theme to see the same screen in Arabic or in dark mode.</p>
       </div>
-    </div>
-  </section>
 
-  <section class="motion" id="motion">
-    <div class="wrap">
-      <p class="kicker">Motion</p>
-      <h2>Gestures live on the UI thread. React only hears the result.</h2>
-      <p class="sub">Animations are driven by Reanimated shared values and worklets, never by per-frame React state. A busy JS thread can't make a swipe stutter.</p>
-      <div class="feat">
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
-          <h3>Tracks the finger</h3>
-          <p>The bottom sheet, swipe-to-delete and swipe-back follow your touch 1:1 and settle with springs that carry your release velocity.</p>
-        </div>
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></div>
-          <h3>Interruptible</h3>
-          <p>Grab the product transition mid-flight and drag it back. Nothing has to finish before you can change your mind.</p>
-        </div>
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
-          <h3>Virtualised grid</h3>
-          <p>1,000 products with stable keys. Rows don't re-render when the cart count changes, and tiles request images at their display size.</p>
-        </div>
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/><path d="M12 6v6l4 2"/></svg></div>
-          <h3>Instant feedback</h3>
-          <p>Pressed states are drawn by the native button view, with haptics where they help, so a tap answers before any data arrives.</p>
-        </div>
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
-          <h3>Respects reduce motion</h3>
-          <p>With the system setting on, movement becomes cross-fades and state changes. Nothing important is lost.</p>
-        </div>
-        <div>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div>
-          <h3>Dark mode</h3>
-          <p>Follows the system, with its own tuned surfaces rather than an inverted palette.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="tour">
+        <div class="panels">
+          <article class="panel" data-screen="home" id="panel-home">
+            <h3>Home <span lang="ar" dir="rtl">الرئيسية</span></h3>
+            <ul>
+              <li><b>The search header shrinks</b> into a compact bar as you scroll.</li>
+              <li><b>The banner carousel</b> plays by itself and pauses while your finger is on it.</li>
+              <li><b>Two horizontal rails</b>: categories, then best sellers.</li>
+            </ul>
+            <figure class="inline-shot" data-screen="home"><img loading="lazy" width="680" height="1472" src="shots/home-scrolled-en-light.jpg" alt=""></figure>
+          </article>
 
-  <section id="rtl">
-    <div class="wrap">
-      <p class="kicker">Arabic</p>
-      <h2>One toggle flips everything, including which way you swipe.</h2>
-      <p class="sub">Layout uses logical start and end, never left and right. Gesture and transition maths multiply by the reading direction, so swipe-to-delete and swipe-back mirror too.</p>
-      <div class="split">
-        <div class="lang" dir="ltr" lang="en">
-          <span class="tag">English · LTR</span>
-          <div class="row">
-            <div class="thumb" style="background-image:url('https://picsum.photos/seed/p-0123-1/120/120')"></div>
-            <div class="meta"><b>Omega-3 Fish Oil</b><span>2 × SAR 48.00</span></div>
-            <div class="swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Swipe to remove</div>
+          <article class="panel" data-screen="category" id="panel-category">
+            <h3>Category <span lang="ar" dir="rtl">الأقسام</span></h3>
+            <ul>
+              <li><b>1,000 products</b> in a virtualised two-column grid, fetched in pages of 20.</li>
+              <li><b>Images fade in once</b> from a placeholder and don't flicker when you scroll back.</li>
+              <li><b>The filter and sort sheet</b> follows your finger and snaps open or closed.</li>
+            </ul>
+            <figure class="inline-shot" data-screen="category"><img loading="lazy" width="680" height="1472" src="shots/category-en-light.jpg" alt=""></figure>
+          </article>
+
+          <article class="panel" data-screen="product" id="panel-product">
+            <h3>Product <span lang="ar" dir="rtl">المنتج</span></h3>
+            <ul>
+              <li><b>The image grows out of the grid tile</b> and shrinks back into it when you go back.</li>
+              <li><b>A swipeable gallery</b> with a page indicator.</li>
+              <li><b>Add to cart</b> confirms with motion and bumps the cart badge.</li>
+            </ul>
+            <figure class="inline-shot" data-screen="product"><img loading="lazy" width="680" height="1472" src="shots/product-en-light.jpg" alt=""></figure>
+          </article>
+
+          <article class="panel" data-screen="cart" id="panel-cart">
+            <h3>Cart <span lang="ar" dir="rtl">السلة</span></h3>
+            <ul>
+              <li><b>Items animate in and out</b>, and the rest of the list closes the gap.</li>
+              <li><b>Swipe to delete, with undo.</b> In Arabic the swipe runs the other way.</li>
+              <li><b>A quantity stepper</b>, and 19% TVA on its own line above the total in dinars.</li>
+            </ul>
+            <figure class="inline-shot" data-screen="cart"><img loading="lazy" width="680" height="1472" src="shots/cart-en-light.jpg" alt=""></figure>
+          </article>
+        </div>
+
+        <aside class="stage" aria-label="App screenshots">
+          <div class="controls">
+            <div class="seg" role="group" aria-label="Screenshot language">
+              <button type="button" data-lang="en" aria-pressed="true">EN</button>
+              <button type="button" data-lang="ar" lang="ar" aria-pressed="false">عربي</button>
+            </div>
+            <div class="seg" role="group" aria-label="Screenshot theme">
+              <button type="button" data-theme="light" aria-pressed="true">Light</button>
+              <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+            </div>
           </div>
-        </div>
-        <div class="lang" dir="rtl" lang="ar">
-          <span class="tag">العربية · من اليمين إلى اليسار</span>
-          <div class="row">
-            <div class="thumb" style="background-image:url('https://picsum.photos/seed/p-0123-1/120/120')"></div>
-            <div class="meta"><b>زيت السمك أوميغا ٣</b><span>٢ × ٤٨٫٠٠ ر.س</span></div>
-            <div class="swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>اسحب للحذف</div>
+          <div class="phone">
+            <div class="screen">
+              <img data-screen="home" class="on" width="680" height="1472" src="shots/home-scrolled-en-light.jpg" alt="">
+              <img data-screen="category" width="680" height="1472" src="shots/category-en-light.jpg" alt="">
+              <img data-screen="product" width="680" height="1472" src="shots/product-en-light.jpg" alt="">
+              <img data-screen="cart" width="680" height="1472" src="shots/cart-en-light.jpg" alt="">
+            </div>
           </div>
-        </div>
+          <p class="caption" id="caption" aria-live="polite">Home, English, light</p>
+        </aside>
       </div>
     </div>
   </section>
 
-  <section class="motion" id="cart">
-    <div class="wrap cart">
+  <section class="tva" id="tva" aria-labelledby="tva-title">
+    <div class="wrap tva-grid">
       <div>
-        <p class="kicker">Cart</p>
-        <h2>Money in integer halalas. VAT shown as its own line.</h2>
-        <p class="sub" style="margin-bottom:24px">Saudi shelf prices include 15% VAT, so the cart works backwards from the gross. All maths is integers, rounded once, with unit tests for quantities, totals and VAT.</p>
-        <code class="blk"><span class="k">vat</span>   = floor((6 × gross + 23) / 46)
-<span class="k">net</span>   = gross − vat
-<span class="k">total</span> = gross</code>
+        <h2 id="tva-title">Shelf prices include TVA, so the cart works backwards.</h2>
+        <p class="lead">In Algeria, shelf prices already contain 19% TVA. The cart adds up what you pay, then takes the TVA share out of that total, rounded to the nearest centime. Every amount is a whole number of centimes, so nothing drifts by a fraction of a dinar. Change the quantities to try it.</p>
+        <pre class="code"><code><span class="k">tva</span> = floor((38 × gross + 119) / 238)
+<span class="k">net</span> = gross − tva</code></pre>
       </div>
-      <div class="receipt" aria-label="Example cart totals">
-        <div class="line"><span>Omega-3 Fish Oil × 2</span><span>96.00</span></div>
-        <div class="line"><span>Vitamin D3 1000 IU × 1</span><span>39.00</span></div>
-        <div class="line"><span>Subtotal (excl. VAT)</span><span>117.39</span></div>
-        <div class="line"><span>VAT 15%</span><span>17.61</span></div>
-        <div class="line"><span>Total</span><span>SAR 135.00</span></div>
+
+      <div class="receipt" aria-label="Example cart">
+        <div id="items"></div>
+        <dl class="sums" aria-live="polite">
+          <div><dt>Subtotal (excl. TVA)</dt><dd id="net">11,827.73 DA</dd></div>
+          <div><dt>TVA (19%)</dt><dd id="tvav">2,247.27 DA</dd></div>
+          <div class="total"><dt>Total</dt><dd id="total">14,075.00 DA</dd></div>
+        </dl>
+        <p class="receipt-note">The same three items and the same arithmetic as the cart screen above. In Arabic the app writes the currency as <span lang="ar" dir="rtl">د.ج</span>.</p>
       </div>
     </div>
   </section>
 
-  <section id="stack">
+  <section class="built" id="built" aria-labelledby="built-title">
     <div class="wrap">
-      <p class="kicker">Built with</p>
-      <h2>A production React Native stack.</h2>
-      <p class="sub">Runs with no setup on a deterministic fake backend (1,000 products from a fixed seed, pages of 20, simulated latency and failures). Add Supabase keys for accounts, synced favourites and real orders, secured by Row Level Security.</p>
-      <div class="stack">
-        <span>Expo SDK 58</span><span>React Native 0.88 · New Architecture</span><span>Hermes</span><span>React Compiler</span><span>Reanimated 4</span><span>Gesture Handler 3</span><span>FlashList v2</span><span>expo-image</span><span>Expo Router</span><span>zustand</span><span>TanStack Query</span><span>MMKV</span><span>Supabase</span><span>TypeScript strict</span><span>Jest</span><span>Maestro</span>
-      </div>
-    </div>
-  </section>
-
-  <section id="run" style="padding-top:0">
-    <div class="wrap">
-      <div class="run">
+      <h2 id="built-title">How it's built</h2>
+      <p class="lead">Expo SDK 58, Reanimated 4, Gesture Handler 3 and FlashList v2, in TypeScript.</p>
+      <dl>
         <div>
-          <h2>Run it in three commands.</h2>
-          <p>No keys needed: the fake backend starts by default. For Supabase, put the project URL and anon key in <span class="mono">.env</span> as <span class="mono">EXPO_PUBLIC_SUPABASE_URL</span> and <span class="mono">EXPO_PUBLIC_SUPABASE_ANON_KEY</span>.</p>
+          <dt>Motion stays off the JavaScript thread</dt>
+          <dd>Gestures and animations run as <b>Reanimated worklets</b> on shared values. React state changes when a gesture ends, never on every frame, so a busy JavaScript thread can't make a swipe stutter.</dd>
         </div>
-        <code class="blk"><span class="k">git</span> clone &lt;repo&gt; nabd && cd nabd
+        <div>
+          <dt>A grid that holds 1,000 products</dt>
+          <dd><b>FlashList v2</b> recycles cells with stable keys. Tiles don't re-render when the cart count changes, and each one asks for an image at the size it is drawn, not the full 800 pixels.</dd>
+        </div>
+        <div>
+          <dt>Direction is a value, not a branch</dt>
+          <dd>Layout uses logical start and end. Gesture and transition maths multiply by the reading direction, which is why <b>swipe to delete and swipe back</b> mirror in Arabic without separate code paths.</dd>
+        </div>
+        <div>
+          <dt>A deterministic fake backend</dt>
+          <dd>The 1,000 products come from a <b>fixed seed</b>, identical on every run. The service answers in pages of 20 with a random delay and occasional failures, so the loading, empty and error states are real screens.</dd>
+        </div>
+        <div>
+          <dt>Reduce motion is respected</dt>
+          <dd>With the system setting on, movement becomes cross-fades and instant state changes. Nothing you need is lost.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="run" aria-labelledby="run-title">
+    <div class="wrap">
+      <div class="run on-pine">
+        <div>
+          <h2 id="run-title">Run it locally</h2>
+          <p>No accounts or keys needed. The app starts on its built-in fake backend; open it in Expo Go or a development build.</p>
+          <a class="btn btn-lime" href="https://github.com/ismailbentabett/nabd-pharmacy">View the code</a>
+        </div>
+        <pre class="code"><code><span class="k">git</span> clone https://github.com/ismailbentabett/nabd-pharmacy
+<span class="k">cd</span> nabd-pharmacy
 <span class="k">npm</span> install
-<span class="k">npx</span> expo start</code>
+<span class="k">npx</span> expo start</code></pre>
       </div>
     </div>
   </section>
@@ -364,10 +436,158 @@
 
 <footer>
   <div class="wrap">
-    <a class="brand" href="#top"><img src="icon.svg" alt="" width="28" height="28">Nabd</a>
-    <span>A portfolio project. Product names and images are placeholders. Not a real pharmacy.</span>
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="30" height="30">Nabd <span lang="ar" dir="rtl">نبض</span></a>
+    <span>A portfolio project. Product names and photos are placeholders; this is not a real pharmacy.</span>
+    <a class="plain" href="https://github.com/ismailbentabett/nabd-pharmacy">Source on GitHub</a>
   </div>
 </footer>
 
+<script>
+(function () {
+  /* ---------- Screenshot tour ---------- */
+  // Captures that exist. Missing combinations fall back and the caption says so.
+  var have = {
+    home:     ['en-light', 'ar-light', 'en-dark'],
+    category: ['en-light', 'ar-light', 'en-dark'],
+    product:  ['en-light', 'ar-light', 'en-dark'],
+    cart:     ['en-light', 'ar-light', 'en-dark']
+  };
+  // The English light Home capture is taken mid-scroll, so the panel shows the header shrinking.
+  var fileFor = { 'home/en-light': 'home-scrolled-en-light' };
+  var names = { home: 'Home', category: 'Category', product: 'Product', cart: 'Cart' };
+  var langName = { en: 'English', ar: 'Arabic' };
+  var alts = {
+    home: 'The home screen: search header, banner carousel with a page indicator, category rail and best sellers rail.',
+    category: 'The category screen: a two-column grid of products with prices, ratings and a filter and sort button.',
+    product: 'The product screen: a large gallery image with a page indicator, price with a TVA note, and an add to cart bar.',
+    cart: 'The cart screen: three items with quantity steppers, subtotal excluding TVA, a 19% TVA line and the total in dinars.'
+  };
+  var state = { lang: 'en', theme: 'light', screen: 'home' };
+
+  function pick(screen) {
+    var list = have[screen];
+    var want = state.lang + '-' + state.theme;
+    if (list.indexOf(want) > -1) return { key: want, note: '' };
+    var sameLang = list.filter(function (k) { return k.indexOf(state.lang + '-') === 0; })[0];
+    if (sameLang) return { key: sameLang, note: 'No ' + state.theme + ' capture of this one yet, so this is the ' + sameLang.split('-')[1] + ' version.' };
+    var sameTheme = list.filter(function (k) { return k.slice(-state.theme.length) === state.theme; })[0];
+    var key = sameTheme || list[0];
+    return { key: key, note: 'No ' + langName[state.lang] + ' capture of this one yet, so this is the ' + langName[key.split('-')[0]] + ' version.' };
+  }
+
+  function describe(screen, key) {
+    var p = key.split('-');
+    return names[screen] + ', ' + langName[p[0]] + ', ' + p[1];
+  }
+
+  function applyVariant() {
+    Object.keys(have).forEach(function (screen) {
+      var r = pick(screen);
+      var src = 'shots/' + (fileFor[screen + '/' + r.key] || screen + '-' + r.key) + '.jpg';
+      var alt = alts[screen] + ' Shown in ' + langName[r.key.split('-')[0]] + ', ' + r.key.split('-')[1] + ' theme.';
+      document.querySelectorAll('img[data-screen="' + screen + '"], .inline-shot[data-screen="' + screen + '"] img').forEach(function (img) {
+        if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+        // The sticky phone describes only the visible layer; the others are hidden from assistive tech.
+        if (img.closest('.screen')) {
+          img.setAttribute('alt', img.classList.contains('on') ? alt : '');
+        } else {
+          img.setAttribute('alt', alt);
+        }
+      });
+    });
+    updateCaption();
+  }
+
+  function updateCaption() {
+    var r = pick(state.screen);
+    document.getElementById('caption').textContent = describe(state.screen, r.key) + (r.note ? '. ' + r.note : '');
+  }
+
+  function show(screen) {
+    if (screen === state.screen) return;
+    state.screen = screen;
+    document.querySelectorAll('.screen img').forEach(function (img) {
+      img.classList.toggle('on', img.dataset.screen === screen);
+    });
+    document.querySelectorAll('.panel').forEach(function (p) {
+      p.classList.toggle('is-active', p.dataset.screen === screen);
+    });
+    applyVariant();
+  }
+
+  document.querySelectorAll('.seg button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var group = btn.dataset.lang ? 'lang' : 'theme';
+      state[group] = btn.dataset[group];
+      btn.parentNode.querySelectorAll('button').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      applyVariant();
+    });
+  });
+
+  document.querySelector('.panel').classList.add('is-active');
+  applyVariant();
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) show(e.target.dataset.screen); });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    document.querySelectorAll('.panel').forEach(function (p) { io.observe(p); });
+  }
+
+  /* ---------- Live receipt (integer centimes) ---------- */
+  var items = [
+    { name: 'NordaCare Digestive Enzymes', size: '10 sachets', price: 77500, qty: 1 },
+    { name: 'Aroma Nuur Rose Garden', size: '100 ml', price: 1180000, qty: 1 },
+    { name: 'FitFuel Protein Bars', size: 'Box, 2 kg', price: 150000, qty: 1 }
+  ];
+  var MAX = 9;
+  // Integer centimes to an English dinar string, e.g. 125000 -> "1,250.00 DA".
+  function da(h) {
+    var whole = Math.floor(h / 100), frac = h % 100;
+    return whole.toLocaleString('en-US') + '.' + (frac < 10 ? '0' : '') + frac + ' DA';
+  }
+  var minus = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>';
+  var plus = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>';
+  var host = document.getElementById('items');
+  host.innerHTML = items.map(function (it, i) {
+    return '<div class="item">' +
+      '<div class="name">' + it.name + '<small>' + it.size + ', ' + da(it.price) + ' each</small></div>' +
+      '<div class="step">' +
+        '<button type="button" data-i="' + i + '" data-d="-1" aria-label="Remove one ' + it.name + '">' + minus + '</button>' +
+        '<output id="q' + i + '" aria-label="Quantity of ' + it.name + '">' + it.qty + '</output>' +
+        '<button type="button" data-i="' + i + '" data-d="1" aria-label="Add one ' + it.name + '">' + plus + '</button>' +
+      '</div>' +
+      '<div class="line" id="l' + i + '"></div>' +
+    '</div>';
+  }).join('');
+
+  function render() {
+    var gross = 0;
+    items.forEach(function (it, i) {
+      var line = it.price * it.qty;
+      gross += line;
+      document.getElementById('q' + i).textContent = it.qty;
+      document.getElementById('l' + i).textContent = da(line);
+      host.querySelector('[data-i="' + i + '"][data-d="-1"]').disabled = it.qty === 0;
+      host.querySelector('[data-i="' + i + '"][data-d="1"]').disabled = it.qty === MAX;
+    });
+    // TVA share of a TVA-inclusive gross, rounded half up: round(gross × 19 / 119).
+    var tva = Math.floor((38 * gross + 119) / 238);
+    document.getElementById('net').textContent = da(gross - tva);
+    document.getElementById('tvav').textContent = da(tva);
+    document.getElementById('total').textContent = da(gross);
+  }
+  host.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    var it = items[+b.dataset.i];
+    it.qty = Math.max(0, Math.min(MAX, it.qty + (+b.dataset.d)));
+    render();
+  });
+  render();
+})();
+</script>
 </body>
 </html>

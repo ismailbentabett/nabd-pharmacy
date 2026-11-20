@@ -13,7 +13,7 @@ import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { createMMKV } from 'react-native-mmkv';
 
 import { findProduct } from '@/core/catalog';
-import { splitVat, toHalalas, type Halalas, type VatSplit } from '@/core/money';
+import { splitVat, toCentimes, type Centimes, type VatSplit } from '@/core/money';
 
 import {
   cartReducer,
@@ -37,9 +37,9 @@ export interface CartStorage {
 /** Bump the suffix if the saved shape ever changes; an old value is then ignored, not misread. */
 export const CART_STORAGE_KEY = 'cart.v1';
 
-export function priceOfH(id: string): Halalas | undefined {
+export function priceOfH(id: string): Centimes | undefined {
   const product = findProduct(id);
-  return product === undefined ? undefined : toHalalas(product.price);
+  return product === undefined ? undefined : toCentimes(product.price);
 }
 
 function isValidLine(id: unknown, line: unknown): line is CartLine {
@@ -153,7 +153,7 @@ export function useLastRemoved(): RemovedLine | null {
   return appCart.useCart(selectLastRemoved);
 }
 
-/** Total, VAT share and amount before VAT. Subscribes to the total only (a number). */
+/** Total, TVA share and amount before TVA. Subscribes to the total only (a number). */
 export function useCartTotals(): VatSplit {
   return splitVat(appCart.useCart(selectGross));
 }

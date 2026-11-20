@@ -24,13 +24,13 @@ import { View, useWindowDimensions } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { discountPercent, type Product } from "@/core/catalog";
-import { toHalalas } from "@/core/money";
+import { toCentimes } from "@/core/money";
 import { PressableScale } from "@/design/PressableScale";
 import { Text } from "@/design/Text";
 import { makeStyles } from "@/design/theme";
 import { layout, radius, size, space } from "@/design/tokens";
 import { MAX_FONT_SCALE, typeStyle, type Variant } from "@/design/typography";
-import { formatSar } from "@/i18n/format";
+import { formatDzd } from "@/i18n/format";
 import { useT } from "@/i18n/useT";
 import { isProductOpening } from "@/motion/hero/openProduct";
 import { useHeroSource } from "@/motion/hero/useHeroSource";
@@ -98,12 +98,12 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
   // Destructured: the ref is only handed to the view, never read during render (react-hooks/refs).
   const { ref: imageRef, hiddenStyle, prepare } = useHeroSource(product.id);
 
-  const now = formatSar(toHalalas(product.price), lang);
+  const now = formatDzd(toCentimes(product.price), lang);
   const price =
     discount > 0 && product.oldPrice !== null
       ? t("a11y.price", {
           price: now,
-          old: formatSar(toHalalas(product.oldPrice), lang),
+          old: formatDzd(toCentimes(product.oldPrice), lang),
         })
       : now;
 

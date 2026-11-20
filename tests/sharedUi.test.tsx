@@ -51,22 +51,22 @@ describe('ProductImage', () => {
 describe('PriceBlock', () => {
   it('reads the current and the old price as one sentence when there is a discount', async () => {
     await renderWithProviders(<PriceBlock testID="price" price={49.95} oldPrice={59.95} size="tile" />);
-    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('49.95 SAR, was 59.95 SAR');
-    expect(screen.getByText('59.95 SAR')).toBeTruthy();
+    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('49.95 DA, was 59.95 DA');
+    expect(screen.getByText('59.95 DA')).toBeTruthy();
   });
 
   it('shows no old price when it is missing or not higher than the current price', async () => {
     const { rerender } = await renderWithProviders(
       <PriceBlock testID="price" price={49.95} oldPrice={null} size="tile" />,
     );
-    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('49.95 SAR');
+    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('49.95 DA');
     await rerender(<PriceBlock testID="price" price={49.95} oldPrice={49.95} size="hero" />);
     expect(screen.getAllByText(/49\.95/)).toHaveLength(1);
   });
 
   it('uses the Arabic currency label in Arabic', async () => {
     await renderWithProviders(<PriceBlock testID="price" price={10} oldPrice={null} size="tile" />, { lang: 'ar' });
-    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('10.00 ر.س');
+    expect(screen.getByTestId('price').props.accessibilityLabel).toBe('10.00 د.ج');
   });
 });
 

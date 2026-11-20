@@ -14,11 +14,11 @@ import { Profiler } from 'react';
 import { Text } from 'react-native';
 
 import { discountPercent, getCatalog, type Product } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import { layout } from '@/design/tokens';
 import { ProductGrid, ProductGridSkeleton, tileWidthFor, type ProductGridProps } from '@/features/category/ProductGrid';
 import { ProductTile, tileImageSize } from '@/features/category/ProductTile';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { resetProductOpenLatchForTest } from '@/motion/hero/openProduct';
 import { resetHapticsForTest } from '@/motion/haptics';
 import { resetMotionPreferenceForTest } from '@/motion/motionPreference';
@@ -44,8 +44,8 @@ describe('ProductTile', () => {
   it('reads name and price as one sentence and reports which tile was pressed', async () => {
     const onPress = jest.fn();
     await renderWithProviders(<ProductTile product={sale} index={3} width={170} onPress={onPress} />);
-    const now = formatSar(toHalalas(sale.price), 'en');
-    const was = formatSar(toHalalas(sale.oldPrice ?? 0), 'en');
+    const now = formatDzd(toCentimes(sale.price), 'en');
+    const was = formatDzd(toCentimes(sale.oldPrice ?? 0), 'en');
     expect(screen.getByTestId(testIds.productTile(3)).props.accessibilityLabel).toBe(`${sale.name}, ${now}, was ${was}`);
     expect(screen.getByText(sale.name, { includeHiddenElements: true })).toBeTruthy();
     expect(screen.getByText(`Save ${discountPercent(sale)}%`, { includeHiddenElements: true })).toBeTruthy();
@@ -58,7 +58,7 @@ describe('ProductTile', () => {
     const plain = firstProduct((p) => p.oldPrice === null);
     await renderWithProviders(<ProductTile product={plain} index={0} width={170} onPress={noop} />, { lang: 'ar' });
     const label = screen.getByTestId(testIds.productTile(0)).props.accessibilityLabel;
-    expect(label).toBe(`${plain.nameAr}, ${formatSar(toHalalas(plain.price), 'ar')}`);
+    expect(label).toBe(`${plain.nameAr}, ${formatDzd(toCentimes(plain.price), 'ar')}`);
     expect(screen.getByText(plain.brandAr, { includeHiddenElements: true })).toBeTruthy();
     expect(screen.queryByText(plain.name, { includeHiddenElements: true })).toBeNull();
   });

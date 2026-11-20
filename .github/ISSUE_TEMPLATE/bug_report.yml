@@ -1,0 +1,86 @@
+name: Bug report
+description: Something does not work, looks wrong, or moves badly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. For security problems, do not use this form; see SECURITY.md.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the Category tab
+        2. Fling the grid to the bottom
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: screen
+    attributes:
+      label: Screen
+      options:
+        - Home
+        - Category
+        - Product
+        - Cart
+        - Tab bar / navigation
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language / direction
+      options:
+        - English (LTR)
+        - Arabic (RTL)
+        - Both
+    validations:
+      required: true
+  - type: dropdown
+    id: build
+    attributes:
+      label: Build type
+      description: Performance problems should be reproduced on a release build; debug builds are much slower.
+      options:
+        - Release
+        - Debug
+        - Web preview
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and OS version
+      placeholder: e.g. Pixel 6a, Android 15
+    validations:
+      required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Backend
+      options:
+        - Fake backend (no keys)
+        - Supabase
+  - type: checkboxes
+    id: settings
+    attributes:
+      label: System settings in use
+      options:
+        - label: Reduce motion / remove animations is on
+        - label: Large font size or display size
+        - label: Dark mode
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, screen recording or logs
+      description: A short clip helps a lot for motion bugs.

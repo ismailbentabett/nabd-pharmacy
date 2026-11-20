@@ -3,27 +3,27 @@
  * value, the filter & sort sheet edits a draft of it, and Home's category rail changes it through a
  * route param. No React here, so every rule is unit tested on its own.
  *
- * Prices: the sheet's bands are in halalas; they become SAR only for the API query and the labels.
+ * Prices: the sheet's bands are in centimes; they become DA only for the API query and the labels.
  */
 import type { ProductFilters, SortKey } from '@/core/api/fakeApi';
 import { CATEGORIES, categoryById, type Category, type CategoryId } from '@/core/catalog';
-import { toHalalas, type Halalas } from '@/core/money';
+import { toCentimes, type Centimes } from '@/core/money';
 
 export type FilterSortValue = { sort: SortKey; filters: ProductFilters };
 
 /** The catalogue's own order, nothing filtered: the screen's starting value and what Reset goes back to. */
 export const NO_FILTERS: FilterSortValue = { sort: 'relevance', filters: {} };
 
-/** A price band [from, to) in halalas; a missing edge is open-ended. */
-export type PriceBand = Readonly<{ from?: Halalas; to?: Halalas }>;
+/** A price band [from, to) in centimes; a missing edge is open-ended. */
+export type PriceBand = Readonly<{ from?: Centimes; to?: Centimes }>;
 
-/** Four bands of roughly equal size over the seeded catalogue (about 370 / 280 / 210 / 150 items). */
-export const PRICE_BANDS: readonly PriceBand[] = [{ to: 5000 }, { from: 5000, to: 10000 }, { from: 10000, to: 20000 }, { from: 20000 }];
+/** Four bands of roughly equal size over the seeded catalogue (about 370 / 275 / 210 / 145 items). */
+export const PRICE_BANDS: readonly PriceBand[] = [{ to: 180000 }, { from: 180000, to: 360000 }, { from: 360000, to: 720000 }, { from: 720000 }];
 
 /** The catalogue's ratings run from 3.4 to 4.9, so "3+" would filter nothing: 4+ keeps 87 %, 4.5+ half. */
 export const RATING_STEPS: readonly number[] = [4, 4.5];
 
-/** The API takes inclusive SAR bounds; a band's open `to` edge is one halala lower. */
+/** The API takes inclusive DA bounds; a band's open `to` edge is one centime lower. */
 export function priceFilters(band: PriceBand | null): Pick<ProductFilters, 'priceMin' | 'priceMax'> {
   return {
     priceMin: band?.from === undefined ? undefined : band.from / 100,
@@ -31,10 +31,10 @@ export function priceFilters(band: PriceBand | null): Pick<ProductFilters, 'pric
   };
 }
 
-/** Whether `filters` hold exactly this band (`null` = no price filter). Compared in halalas. */
+/** Whether `filters` hold exactly this band (`null` = no price filter). Compared in centimes. */
 export function isPriceBand(filters: ProductFilters, band: PriceBand | null): boolean {
-  const from = filters.priceMin === undefined ? undefined : toHalalas(filters.priceMin);
-  const to = filters.priceMax === undefined ? undefined : toHalalas(filters.priceMax) + 1;
+  const from = filters.priceMin === undefined ? undefined : toCentimes(filters.priceMin);
+  const to = filters.priceMax === undefined ? undefined : toCentimes(filters.priceMax) + 1;
   return from === band?.from && to === band?.to;
 }
 

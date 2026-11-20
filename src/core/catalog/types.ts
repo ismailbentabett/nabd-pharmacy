@@ -16,11 +16,11 @@ export interface Product {
   brand: string;
   brandAr: string;
   category: CategoryId;
-  /** SAR, VAT included, 2 decimals. Converted to halalas before any arithmetic. */
+  /** DA (Algerian dinar), TVA included. Converted to centimes before any arithmetic. */
   price: number;
-  /** Pre-discount SAR price, or null when the product is not on offer. */
+  /** Pre-discount DA price, or null when the product is not on offer. */
   oldPrice: number | null;
-  currency: 'SAR';
+  currency: 'DZD';
   rating: number;
   reviews: number;
   inStock: boolean;

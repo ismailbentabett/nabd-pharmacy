@@ -3,7 +3,7 @@
  * `,` thousands. Written without Intl or regex and marked as worklets so the animated cart total can
  * format on the UI thread with exactly the same output as the JS side.
  */
-import type { Halalas } from '@/core/money';
+import type { Centimes } from '@/core/money';
 
 export type Lang = 'en' | 'ar';
 
@@ -19,10 +19,10 @@ function groupThousands(whole: number): string {
   return out;
 }
 
-/** 4995 → "49.95". */
-export function formatAmount(halalas: Halalas): string {
+/** 125000 → "1,250.00". */
+export function formatAmount(centimes: Centimes): string {
   'worklet';
-  const rounded = Math.round(halalas);
+  const rounded = Math.round(centimes);
   const sign = rounded < 0 ? '-' : '';
   const abs = Math.abs(rounded);
   const cents = abs % 100;
@@ -33,13 +33,13 @@ export function formatAmount(halalas: Halalas): string {
 // above every worklet that calls it.
 export function currencyLabel(lang: Lang): string {
   'worklet';
-  return lang === 'ar' ? 'ر.س' : 'SAR';
+  return lang === 'ar' ? 'د.ج' : 'DA';
 }
 
-/** 4995 → "49.95 SAR" / "49.95 ر.س". */
-export function formatSar(halalas: Halalas, lang: Lang): string {
+/** 125000 → "1,250.00 DA" / "1,250.00 د.ج". */
+export function formatDzd(centimes: Centimes, lang: Lang): string {
   'worklet';
-  return `${formatAmount(halalas)} ${currencyLabel(lang)}`;
+  return `${formatAmount(centimes)} ${currencyLabel(lang)}`;
 }
 
 /** 1234 → "1,234". */

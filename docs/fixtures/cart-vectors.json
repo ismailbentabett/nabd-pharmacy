@@ -1,6 +1,6 @@
 {
-  "formula": "vat = floor((6*gross + 23) / 46)  // == round_half_up(gross*15/115), integer halalas; net = gross - vat",
-  "unit": "halalas (1 SAR = 100 halalas)",
+  "formula": "vat = floor((38*gross + 119) / 238)  // == round_half_up(gross*19/119), integer centimes; net = gross - vat",
+  "unit": "centimes (1 DA = 100 centimes)",
   "cases": [
     {
       "name": "empty",
@@ -12,81 +12,81 @@
       }
     },
     {
-      "name": "single item 49.95 x1",
+      "name": "single item 1,800 x1",
       "lines": [
         {
-          "priceH": 4995,
+          "priceH": 180000,
           "qty": 1
         }
       ],
       "expected": {
-        "gross": 4995,
-        "vat": 652,
-        "net": 4343
+        "gross": 180000,
+        "vat": 28739,
+        "net": 151261
       }
     },
     {
-      "name": "single item 49.95 x3",
+      "name": "single item 1,800 x3",
       "lines": [
         {
-          "priceH": 4995,
+          "priceH": 180000,
           "qty": 3
         }
       ],
       "expected": {
-        "gross": 14985,
-        "vat": 1955,
-        "net": 13030
+        "gross": 540000,
+        "vat": 86218,
+        "net": 453782
       }
     },
     {
       "name": "mixed",
       "lines": [
         {
-          "priceH": 4995,
+          "priceH": 180000,
           "qty": 2
         },
         {
-          "priceH": 12000,
+          "priceH": 435000,
           "qty": 1
         },
         {
-          "priceH": 899,
+          "priceH": 35000,
           "qty": 5
         }
       ],
       "expected": {
-        "gross": 26485,
-        "vat": 3455,
-        "net": 23030
+        "gross": 970000,
+        "vat": 154874,
+        "net": 815126
       }
     },
     {
-      "name": "exactly 115.00 -> vat 15.00",
+      "name": "exactly 1,190.00 -> TVA 190.00",
       "lines": [
         {
-          "priceH": 11500,
+          "priceH": 119000,
           "qty": 1
         }
       ],
       "expected": {
-        "gross": 11500,
-        "vat": 1500,
-        "net": 10000
+        "gross": 119000,
+        "vat": 19000,
+        "net": 100000
       }
     },
     {
-      "name": "half-halala boundary",
+      "name": "near-half-centime boundary (0.47 DA: 7.504 rounds up)",
       "lines": [
         {
-          "priceH": 23,
+          "priceH": 47,
           "qty": 1
         }
       ],
       "expected": {
-        "gross": 23,
-        "vat": 3,
-        "net": 20
+        "gross": 47,
+        "vat": 8,
+        "net": 39
       }
     },
     {
@@ -103,22 +103,22 @@
       ],
       "expected": {
         "gross": 30,
-        "vat": 4,
-        "net": 26
+        "vat": 5,
+        "net": 25
       }
     },
     {
       "name": "large qty",
       "lines": [
         {
-          "priceH": 19999,
+          "priceH": 2480000,
           "qty": 99
         }
       ],
       "expected": {
-        "gross": 1979901,
-        "vat": 258248,
-        "net": 1721653
+        "gross": 245520000,
+        "vat": 39200672,
+        "net": 206319328
       }
     }
   ]

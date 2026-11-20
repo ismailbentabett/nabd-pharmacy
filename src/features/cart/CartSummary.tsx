@@ -1,9 +1,9 @@
 /**
  * The totals card under the cart lines (K-04, D-07): free-delivery progress, then subtotal before
- * VAT, the 15 % VAT share on its own line, and the total in SAR.
+ * TVA, the 19 % TVA share on its own line, and the total in DA.
  *
- * - Prices include VAT, so the total is the sum of the lines and VAT is the share inside it
- *   (`splitVat`, integer halalas, tested against docs/fixtures/cart-vectors.json).
+ * - Prices include TVA, so the total is the sum of the lines and TVA is the share inside it
+ *   (`splitVat`, integer centimes, tested against docs/fixtures/cart-vectors.json).
  * - The numbers are plain text rendered from the store in the same commit as the change: they are
  *   never animated, so they are never stale, even for a frame. Only the delivery bar moves.
  * - This is the only component that subscribes to the total; rows and the header do not (F-05).
@@ -24,7 +24,7 @@ import { Text } from '@/design/Text';
 import { makeStyles, useColors } from '@/design/theme';
 import { layout, radius, size, space } from '@/design/tokens';
 import { useDirection } from '@/i18n/direction';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { useMotionPreference } from '@/motion/motionPreference';
 import { effectsSlow } from '@/motion/springs';
@@ -81,7 +81,7 @@ export function CartSummary() {
 
   const deliveryText = delivery.unlocked
     ? t('cart.freeDeliveryDone')
-    : t('cart.freeDelivery', { amount: formatSar(delivery.remaining, lang) });
+    : t('cart.freeDelivery', { amount: formatDzd(delivery.remaining, lang) });
 
   return (
     <View style={styles.card}>
@@ -97,10 +97,10 @@ export function CartSummary() {
         </View>
       </View>
 
-      <SummaryLine label={t('cart.subtotal')} value={formatSar(net, lang)} testID={testIds.cartSubtotal} />
-      <SummaryLine label={t('cart.vat')} value={formatSar(vat, lang)} testID={testIds.cartVat} />
+      <SummaryLine label={t('cart.subtotal')} value={formatDzd(net, lang)} testID={testIds.cartSubtotal} />
+      <SummaryLine label={t('cart.vat')} value={formatDzd(vat, lang)} testID={testIds.cartVat} />
       <View style={styles.rule} />
-      <SummaryLine label={t('cart.total')} value={formatSar(gross, lang)} testID={testIds.cartTotal} strong />
+      <SummaryLine label={t('cart.total')} value={formatDzd(gross, lang)} testID={testIds.cartTotal} strong />
       <CheckoutButton />
     </View>
   );

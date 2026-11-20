@@ -17,7 +17,7 @@ Written 2026-11-20. ADRs: `docs/DECISIONS.md` (ADR-055 onward covers this plan).
 
 - Motion runs on the UI thread. It is driven by gestures, can be interrupted, and works in RTL. It also has a reduced-motion variant.
 - Numbers are only ever measured, never estimated (`docs/PERF_LOG.md`). Unmeasured means `NOT MEASURED YET`.
-- Money is integer halalas, and prices include 15% VAT.
+- Money is integer centimes (1 DA = 100 centimes), and prices include 19% TVA (ADR-061).
 - The app keeps working offline and with no backend at all. The fake API is the fallback, so a reviewer can always run it.
 - Every new feature ships with:
   - loading, empty and error states
@@ -47,9 +47,9 @@ The README states this honestly (ADR-056).
 
 | # | Task | Files | Done when |
 |---|---|---|---|
-| B1 | Schema: `categories`, `products`, `banners`, `profiles`, `favorites`, `orders`, `order_items`, `reviews`. Prices are stored as integer halalas. | `supabase/migrations/0001_schema.sql` | applies cleanly on a fresh project |
+| B1 | Schema: `categories`, `products`, `banners`, `profiles`, `favorites`, `orders`, `order_items`, `reviews`. Prices are stored as integer centimes (columns keep their `_h` names). | `supabase/migrations/0001_schema.sql` | applies cleanly on a fresh project |
 | B2 | RLS: catalog is read-only for `anon`; `favorites`/`orders`/`reviews`/`profiles` are owner-only, through `auth.uid()` | `0002_rls.sql` | every table has RLS on; there is no policy without a check |
-| B3 | `place_order(lines jsonb)` RPC, `security definer`. It reprices every line from `products` (the client never sends a price), checks stock, writes the order and its items in one transaction, and returns the order with its VAT split. | `0003_place_order.sql` | a tampered price cannot change the total |
+| B3 | `place_order(lines jsonb)` RPC, `security definer`. It reprices every line from `products` (the client never sends a price), checks stock, writes the order and its items in one transaction, and returns the order with its TVA split. | `0003_place_order.sql` | a tampered price cannot change the total |
 | B4 | Seed generated from the deterministic catalog: the same 1,000 products, ids and prices as the fake API | `scripts/supabase/make-seed.ts` → `supabase/seed.sql` | product `p-0001` is identical in both sources |
 | B5 | Client: `createClient` with an MMKV-backed auth storage, configured from `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`; only the anon key ever ships | `src/core/supabase/client.ts`, `.env.example` | the app builds and runs with or without the keys |
 | B6 | `SupabaseApi` implements the same `CatalogApi` interface as the fake API (pages of 20, filters, sort, count, best sellers, banners). `src/state/api.ts` picks the backend at start-up. | `src/core/api/supabaseApi.ts`, `src/state/api.ts` | screens do not know which backend they talk to |
@@ -65,7 +65,7 @@ The README states this honestly (ADR-056).
 | C2 | **Search**: debounced, with recent searches, results grid, and an "no results" state with suggestions | The Home search bar opens it; the field keeps focus; results reuse `ProductTile` and the hero transition | typing filters 1,000 products with no jank; recent searches persist |
 | C3 | **Account tab**: language switch, appearance, favourites list, order history, sign in with an email one-time code (Supabase Auth) | 4th tab in `TabBar`, same pill motion | works signed-out (local favourites) and signed-in |
 | C4 | **Checkout (demo, no payment)**: the cart's "Place order" calls `place_order` (Supabase) or a local order (fake). A confirmation with an animated pulse check follows. | Button morphs to a spinner, then a pulse-line check is drawn. The cart empties with a layout animation. | the order appears in Account → Orders |
-| C5 | **Order history**: list plus detail, with the VAT split per order | Skeletons and an empty state | reads from the same backend as C4 |
+| C5 | **Order history**: list plus detail, with the TVA split per order | Skeletons and an empty state | reads from the same backend as C4 |
 | C6 | Product page: "Frequently bought together" rail and rating breakdown (stretch) | reuses rails | — |
 
 **Cut-lines C:** C6 first, then C5's detail screen (list only), then the Supabase sync in C1 (local only).

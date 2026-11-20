@@ -22,7 +22,7 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Product } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import { PressableScale } from '@/design/PressableScale';
 import { Text } from '@/design/Text';
 import { makeStyles, useColors } from '@/design/theme';
@@ -30,7 +30,7 @@ import { layout, radius, size, space } from '@/design/tokens';
 import { MAX_FONT_SCALE, typeStyle } from '@/design/typography';
 import { openProduct } from '@/features/home/homeRoutes';
 import { useDirection } from '@/i18n/direction';
-import { formatSar } from '@/i18n/format';
+import { formatDzd } from '@/i18n/format';
 import { useT } from '@/i18n/useT';
 import { useHeroSource } from '@/motion/hero/useHeroSource';
 import { api } from '@/state/api';
@@ -180,10 +180,10 @@ function SearchRowView({ product }: { product: Product }) {
   const { ref, hiddenStyle, prepare } = useHeroSource(product.id);
   const name = lang === 'ar' ? product.nameAr : product.name;
   const brand = lang === 'ar' ? product.brandAr : product.brand;
-  const now = formatSar(toHalalas(product.price), lang);
+  const now = formatDzd(toCentimes(product.price), lang);
   const price =
     product.oldPrice !== null && product.oldPrice > product.price
-      ? t('a11y.price', { price: now, old: formatSar(toHalalas(product.oldPrice), lang) })
+      ? t('a11y.price', { price: now, old: formatDzd(toCentimes(product.oldPrice), lang) })
       : now;
 
   return (

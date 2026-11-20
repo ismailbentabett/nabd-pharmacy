@@ -9,7 +9,7 @@
  * - Fake: the offline build. Same validation rules as the SQL function, prices from the on-device
  *   catalog, orders kept in memory until the app closes.
  *
- * Money stays integer halalas on both sides (`gross_h`, `vat_h`, `net_h`), and the VAT split uses the
+ * Money stays integer centimes on both sides (`gross_h`, `vat_h`, `net_h`), and the TVA split uses the
  * same integer formula as the cart (`splitVat`), so the order total always equals the cart total.
  *
  * Idempotency: every call carries a client `requestId` (a uuid). A retry of the same checkout sends the
@@ -22,7 +22,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { findProduct } from '../catalog';
-import { splitVat, toHalalas, type Halalas } from '../money';
+import { splitVat, toCentimes, type Centimes } from '../money';
 import { BackendError } from './types';
 
 export type OrderStatus = 'placed' | 'preparing' | 'delivered' | 'cancelled';
@@ -38,9 +38,9 @@ export interface OrderSummary {
   /** ISO 8601 timestamp. */
   createdAt: string;
   status: OrderStatus;
-  grossH: Halalas;
-  vatH: Halalas;
-  netH: Halalas;
+  grossH: Centimes;
+  vatH: Centimes;
+  netH: Centimes;
   /** Total units, as the cart badge counts them. */
   itemCount: number;
 }
@@ -188,7 +188,7 @@ function wait(ms: number): Promise<void> {
 }
 
 /** The `place_order` checks, in the same order, against the on-device catalog. */
-function priceFakeOrder(lines: readonly OrderLineInput[]): { gross: Halalas; itemCount: number } {
+function priceFakeOrder(lines: readonly OrderLineInput[]): { gross: Centimes; itemCount: number } {
   if (lines.length === 0) throw new CheckoutFailure({ kind: 'empty' });
   if (lines.length > MAX_ORDER_LINES) throw new CheckoutFailure({ kind: 'tooMany' });
   const seen = new Set<string>();
@@ -205,7 +205,7 @@ function priceFakeOrder(lines: readonly OrderLineInput[]): { gross: Halalas; ite
     const product = findProduct(line.productId);
     if (product === undefined) throw new CheckoutFailure({ kind: 'unknownProduct', productId: line.productId });
     if (!product.inStock) throw new CheckoutFailure({ kind: 'outOfStock', productId: line.productId });
-    gross += toHalalas(product.price) * line.qty;
+    gross += toCentimes(product.price) * line.qty;
     itemCount += line.qty;
   }
   return { gross, itemCount };

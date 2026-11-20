@@ -13,7 +13,7 @@ app/                      Expo Router (routes are thin: compose features only)
   product/[id].tsx        Product (transparentModal-style host for hero transition)
 src/
   core/                   framework-free + testable
-    money.ts              integer halalas, formatSar(), vat split (docs/CART_SPEC.md)
+    money.ts              integer centimes, formatDzd(), TVA split (docs/CART_SPEC.md)
     rng.ts                mulberry32
     catalog/              generator (seeded), copy tables (EN/AR), types
     api/                  fakeApi.ts (pages of 20, delay, 1-in-20 failure, deterministic failure option for tests)
@@ -75,7 +75,7 @@ Gestures: Gesture Handler 3 hook API; all handlers worklets; JS callbacks only t
 Every list/screen has skeleton, empty, error-with-retry states (copy in EN/AR). The fake API's 1-in-20 failure is *expected*: a failed page shows an inline retry row at the list footer (not a full-screen error) and never loses already loaded items.
 
 ## 8. Testing strategy
-- Unit (Jest): money/VAT vectors from `docs/fixtures/cart-vectors.json`, cart reducer (add, merge, setQty, remove, undo, clamp), formatSar (EN/AR), catalog determinism (hash of all 1000 ids/prices stable), fakeApi paging/failure (seeded), i18n parity.
+- Unit (Jest): money/TVA vectors from `docs/fixtures/cart-vectors.json`, cart reducer (add, merge, setQty, remove, undo, clamp), formatDzd (EN/AR), catalog determinism (hash of all 1000 ids/prices stable), fakeApi paging/failure (seeded), i18n parity.
 - Component (RNTL): CartRow stepper, Summary updates, Undo flow, tile press.
 - E2E/perf (Maestro): grid scroll flow, add-to-cart → badge, RTL toggle smoke.
 - Manual device checklist: `docs/RTL_CHECKLIST.md` + `docs/PERF_PLAN.md`.

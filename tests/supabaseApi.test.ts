@@ -8,7 +8,7 @@ import { applyFilters, createSupabaseApi, rowToBanner, rowToProduct, SORT_ORDER,
 import { BackendError, SORT_KEYS } from '@/core/api/types';
 import { BANNERS, discountPercent, getCatalog, pickBestSellers } from '@/core/catalog';
 import type { Product } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 
 type Call = [method: string, ...args: unknown[]];
 type Result = { data?: unknown; error?: { message: string; code?: string } | null; count?: number | null };
@@ -54,8 +54,8 @@ function rowOf(p: Product, rank: number | null = null): ProductRow {
     brand_en: p.brand,
     brand_ar: p.brandAr,
     category_id: p.category,
-    price_h: toHalalas(p.price),
-    old_price_h: p.oldPrice === null ? null : toHalalas(p.oldPrice),
+    price_h: toCentimes(p.price),
+    old_price_h: p.oldPrice === null ? null : toCentimes(p.oldPrice),
     discount_pct: discountPercent(p),
     // numeric(2,1) can arrive as a string from some PostgREST versions; both must work.
     rating: p.rating.toFixed(1),
@@ -120,7 +120,7 @@ describe('applyFilters', () => {
     expect(calls).toEqual([]);
   });
 
-  it('maps every filter to its column, with prices in halalas', () => {
+  it('maps every filter to its column, with prices in centimes', () => {
     const { builder, calls } = record();
     applyFilters(builder, {
       category: 'vitamins',

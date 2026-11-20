@@ -16,7 +16,7 @@ Rule: wow = **craft + physics + proof**, not extra screens. Each moment has an o
 9. **Image delight** — dominant-colour/blurhash placeholder per product (deterministic from seed), 160 ms fade only on first load.
 10. **Skeletons that match layout** (shimmer on UI thread) and **designed error rows** with Retry (the 1-in-20 failure is a feature demo, not a bug).
 11. **Haptics vocabulary** — selection (stepper, tab), impact-light (add, sheet snap), notification-warning (delete threshold). One module, one table.
-12. **Free-delivery nudge** in cart: progress bar toward 100 SAR with animated fill (display only; no backend).
+12. **Free-delivery nudge** in cart: progress bar toward 4,000 DA with animated fill (display only; no backend).
 
 ## Tier 3 — only after Tier 1+2 are ✅ and measured
 13. Dark mode (semantic tokens). 14. Shared header-to-compact tab bar hide on scroll-down in Category (translate only). 15. Baseline Profile for faster cold start. 16. Maestro-recorded smoke flows saved in `scripts/perf/flows/`.

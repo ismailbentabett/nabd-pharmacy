@@ -33,18 +33,18 @@ const ORDERS: OrderSummary[] = [
     id: '6f1c2a90-4b1e-4d7a-9c55-0a1b2c3d4e5f',
     createdAt: '2026-11-20T09:30:00.000Z',
     status: 'preparing',
-    grossH: 13298,
-    vatH: 1735,
-    netH: 11563,
+    grossH: 665000,
+    vatH: 106176,
+    netH: 558824,
     itemCount: 3,
   },
   {
     id: 'offline-000001',
     createdAt: '2026-11-02T18:00:00.000Z',
     status: 'delivered',
-    grossH: 11500,
-    vatH: 1500,
-    netH: 10000,
+    grossH: 595000,
+    vatH: 95000,
+    netH: 500000,
     itemCount: 1,
   },
 ];
@@ -114,8 +114,8 @@ describe('OrdersSection', () => {
     expect(screen.getByText(copy.en['orders.status.delivered'])).toBeOnTheScreen();
     expect(screen.getByText('20 Nov 2026 · 3 items')).toBeOnTheScreen();
     expect(screen.getByText('2 Nov 2026 · 1 item')).toBeOnTheScreen();
-    expect(screen.getByText(/132\.98/)).toBeOnTheScreen();
-    expect(screen.getByText(/115\.00/)).toBeOnTheScreen();
+    expect(screen.getByText(/6,650\.00/)).toBeOnTheScreen();
+    expect(screen.getByText(/5,950\.00/)).toBeOnTheScreen();
   });
 
   it('renders in Arabic with Western digits', async () => {

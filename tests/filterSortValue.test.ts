@@ -4,7 +4,7 @@
  */
 import { createFakeApi } from '@/core/api/fakeApi';
 import { CATEGORIES, getCatalog } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
+import { toCentimes } from '@/core/money';
 import {
   activeFilterCount,
   ALL_CATEGORIES,
@@ -20,11 +20,11 @@ import {
 } from '@/features/category/filterSortValue';
 
 describe('price bands', () => {
-  it('turn into inclusive SAR bounds, the open top edge one halala lower', () => {
+  it('turn into inclusive DA bounds, the open top edge one centime lower', () => {
     expect(priceFilters(null)).toEqual({ priceMin: undefined, priceMax: undefined });
-    expect(priceFilters({ to: 5000 })).toEqual({ priceMin: undefined, priceMax: 49.99 });
-    expect(priceFilters({ from: 5000, to: 10000 })).toEqual({ priceMin: 50, priceMax: 99.99 });
-    expect(priceFilters({ from: 20000 })).toEqual({ priceMin: 200, priceMax: undefined });
+    expect(priceFilters({ to: 180000 })).toEqual({ priceMin: undefined, priceMax: 1799.99 });
+    expect(priceFilters({ from: 180000, to: 360000 })).toEqual({ priceMin: 1800, priceMax: 3599.99 });
+    expect(priceFilters({ from: 720000 })).toEqual({ priceMin: 7200, priceMax: undefined });
   });
 
   it('are recognised again from the filters they produce, and only that band is', () => {
@@ -38,11 +38,11 @@ describe('price bands', () => {
     expect(isPriceBand({ priceMin: 12.5 }, null)).toBe(false);
   });
 
-  it('as API filters, hold exactly the products whose halala price is in [from, to): every product once', () => {
+  it('as API filters, hold exactly the products whose centime price is in [from, to): every product once', () => {
     const api = createFakeApi({ delayMs: [0, 0], chaos: 0 });
     const { products } = getCatalog();
     const inBand = (price: number, band: (typeof PRICE_BANDS)[number]) => {
-      const h = toHalalas(price);
+      const h = toCentimes(price);
       return (band.from === undefined || h >= band.from) && (band.to === undefined || h < band.to);
     };
     const perBand = PRICE_BANDS.map((band) => api.countProducts({ filters: priceFilters(band) }));

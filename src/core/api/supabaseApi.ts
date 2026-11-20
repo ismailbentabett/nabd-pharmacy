@@ -2,8 +2,8 @@
  * The catalog on Supabase (Postgres + PostgREST). Same contract as the offline fake, so screens
  * do not know which one is live.
  *
- * Money crosses the wire as integer halalas (`price_h`) and becomes SAR only here, at the boundary,
- * because the app's `Product` keeps the brief's SAR shape (D-02). Every sort ends on `id`, so a page
+ * Money crosses the wire as integer centimes (`price_h`) and becomes DA only here, at the boundary,
+ * because the app's `Product` keeps the brief's float price shape (D-02). Every sort ends on `id`, so a page
  * boundary never shows the same product twice.
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -11,7 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { PAGE_SIZE } from '../catalog';
 import { clampSearchLimit } from '../catalog/search';
 import type { Banner, Category, CategoryId, Product } from '../catalog/types';
-import { toHalalas } from '../money';
+import { toCentimes } from '../money';
 import {
   BackendError,
   type CatalogApi,
@@ -72,7 +72,7 @@ export const PRODUCT_COLUMNS =
   'id, sku, name_en, name_ar, brand_en, brand_ar, category_id, price_h, old_price_h, discount_pct, ' +
   'rating, reviews, in_stock, images, description_en, description_ar, dominant_color, best_seller_rank';
 
-const fromHalalas = (h: number) => h / 100;
+const fromCentimes = (h: number) => h / 100;
 
 export function rowToProduct(row: ProductRow): Product {
   return {
@@ -83,9 +83,9 @@ export function rowToProduct(row: ProductRow): Product {
     brand: row.brand_en,
     brandAr: row.brand_ar,
     category: row.category_id as CategoryId,
-    price: fromHalalas(row.price_h),
-    oldPrice: row.old_price_h === null ? null : fromHalalas(row.old_price_h),
-    currency: 'SAR',
+    price: fromCentimes(row.price_h),
+    oldPrice: row.old_price_h === null ? null : fromCentimes(row.old_price_h),
+    currency: 'DZD',
     rating: Number(row.rating),
     reviews: row.reviews,
     inStock: row.in_stock,
@@ -102,8 +102,8 @@ export function rowToCategory(row: CategoryRow): Category {
     en: row.name_en,
     ar: row.name_ar,
     icon: row.icon,
-    priceMin: fromHalalas(row.price_min_h),
-    priceMax: fromHalalas(row.price_max_h),
+    priceMin: fromCentimes(row.price_min_h),
+    priceMax: fromCentimes(row.price_max_h),
   };
 }
 
@@ -156,8 +156,8 @@ export function applyFilters<T>(builder: T, query: ProductQuery): T {
   let b = builder as unknown as FilterBuilder;
   if (query.category !== undefined) b = b.eq('category_id', query.category);
   if (f.categories !== undefined && f.categories.length > 0) b = b.in('category_id', f.categories);
-  if (f.priceMin !== undefined) b = b.gte('price_h', toHalalas(f.priceMin));
-  if (f.priceMax !== undefined) b = b.lte('price_h', toHalalas(f.priceMax));
+  if (f.priceMin !== undefined) b = b.gte('price_h', toCentimes(f.priceMin));
+  if (f.priceMax !== undefined) b = b.lte('price_h', toCentimes(f.priceMax));
   if (f.inStockOnly === true) b = b.eq('in_stock', true);
   if (f.minRating !== undefined) b = b.gte('rating', f.minRating);
   return b as unknown as T;

@@ -56,9 +56,9 @@ const ROW: OrderRow = {
   id: '6f1c2a90-4b1e-4d7a-9c55-0a1b2c3d4e5f',
   created_at: '2026-11-20T09:30:00.000Z',
   status: 'preparing',
-  gross_h: 11500,
-  vat_h: 1500,
-  net_h: 10000,
+  gross_h: 595000,
+  vat_h: 95000,
+  net_h: 500000,
   item_count: 3,
 };
 
@@ -111,14 +111,14 @@ describe('orderNumber and orderFromRow', () => {
     expect(orderNumber('offline-000012')).toBe('000012');
   });
 
-  it('maps a row to camelCase and keeps money as integer halalas', () => {
+  it('maps a row to camelCase and keeps money as integer centimes', () => {
     expect(orderFromRow(ROW)).toEqual({
       id: ROW.id,
       createdAt: ROW.created_at,
       status: 'preparing',
-      grossH: 11500,
-      vatH: 1500,
-      netH: 10000,
+      grossH: 595000,
+      vatH: 95000,
+      netH: 500000,
       itemCount: 3,
     });
   });
@@ -134,7 +134,7 @@ describe('createSupabaseOrdersApi', () => {
     const api = createSupabaseOrdersApi(client);
     const order = await api.placeOrder(
       [
-        { productId: 'p-0952', qty: 1 },
+        { productId: 'p-0296', qty: 1 },
         { productId: 'p-0380', qty: 2 },
       ],
       'b7e2c1d0-0000-4000-8000-000000000001',
@@ -145,14 +145,14 @@ describe('createSupabaseOrdersApi', () => {
         'place_order',
         {
           lines: [
-            { product_id: 'p-0952', qty: 1 },
+            { product_id: 'p-0296', qty: 1 },
             { product_id: 'p-0380', qty: 2 },
           ],
           request_id: 'b7e2c1d0-0000-4000-8000-000000000001',
         },
       ],
     ]);
-    expect(order.grossH).toBe(11500);
+    expect(order.grossH).toBe(595000);
     expect(order.id).toBe(ROW.id);
   });
 
@@ -165,7 +165,7 @@ describe('createSupabaseOrdersApi', () => {
 
   it('throws generic when place_order returns nothing', async () => {
     const { client } = fakeClient({ data: null });
-    const error = await rejection(createSupabaseOrdersApi(client).placeOrder([{ productId: 'p-0952', qty: 1 }], newRequestId()));
+    const error = await rejection(createSupabaseOrdersApi(client).placeOrder([{ productId: 'p-0296', qty: 1 }], newRequestId()));
     expect(toCheckoutError(error)).toEqual({ kind: 'generic' });
   });
 
@@ -194,7 +194,7 @@ describe('createFakeOrdersApi', () => {
 
   it('prices an order exactly as the cart totals card does', async () => {
     const lines: OrderLineInput[] = [
-      { productId: 'p-0952', qty: 1 },
+      { productId: 'p-0296', qty: 1 },
       { productId: 'p-0380', qty: 3 },
       { productId: 'p-0001', qty: 2 },
       { productId: 'p-0002', qty: 1 },
@@ -215,14 +215,14 @@ describe('createFakeOrdersApi', () => {
     expect(order.createdAt).toBe('2026-11-20T09:30:00.000Z');
   });
 
-  it('115.00 SAR is 100.00 net + 15.00 VAT', async () => {
-    const order = await fake().placeOrder([{ productId: 'p-0952', qty: 1 }], newRequestId());
-    expect([order.grossH, order.netH, order.vatH]).toEqual([11500, 10000, 1500]);
+  it('5,950.00 DA is 5,000.00 net + 950.00 TVA', async () => {
+    const order = await fake().placeOrder([{ productId: 'p-0296', qty: 1 }], newRequestId());
+    expect([order.grossH, order.netH, order.vatH]).toEqual([595000, 500000, 95000]);
   });
 
   it('gives deterministic ids and lists newest first', async () => {
     const api = fake();
-    const first = await api.placeOrder([{ productId: 'p-0952', qty: 1 }], newRequestId());
+    const first = await api.placeOrder([{ productId: 'p-0296', qty: 1 }], newRequestId());
     const second = await api.placeOrder([{ productId: 'p-0380', qty: 1 }], newRequestId());
     expect([first.id, second.id]).toEqual(['offline-000001', 'offline-000002']);
     expect((await api.listOrders()).map((o) => o.id)).toEqual(['offline-000002', 'offline-000001']);
@@ -240,12 +240,12 @@ describe('createFakeOrdersApi', () => {
     const reason = async (lines: OrderLineInput[]) => toCheckoutError(await rejection(api.placeOrder(lines, newRequestId())));
     expect(await reason([])).toEqual({ kind: 'empty' });
     expect(await reason(tooManyLines)).toEqual({ kind: 'tooMany' });
-    expect(await reason([{ productId: 'p-0952', qty: MAX_LINE_QTY + 1 }])).toEqual({ kind: 'tooMany' });
-    expect(await reason([{ productId: 'p-0952', qty: 0 }])).toEqual({ kind: 'tooMany' });
+    expect(await reason([{ productId: 'p-0296', qty: MAX_LINE_QTY + 1 }])).toEqual({ kind: 'tooMany' });
+    expect(await reason([{ productId: 'p-0296', qty: 0 }])).toEqual({ kind: 'tooMany' });
     expect(
       await reason([
-        { productId: 'p-0952', qty: 1 },
-        { productId: 'p-0952', qty: 1 },
+        { productId: 'p-0296', qty: 1 },
+        { productId: 'p-0296', qty: 1 },
       ]),
     ).toEqual({ kind: 'generic' });
     expect(await reason([{ productId: 'p-9999', qty: 1 }])).toEqual({ kind: 'unknownProduct', productId: 'p-9999' });
@@ -259,13 +259,13 @@ describe('createFakeOrdersApi', () => {
   it('answers a retry with the same request id with the first order, and writes no second one', async () => {
     const api = fake();
     const requestId = newRequestId();
-    const first = await api.placeOrder([{ productId: 'p-0952', qty: 1 }], requestId);
+    const first = await api.placeOrder([{ productId: 'p-0296', qty: 1 }], requestId);
     // Even with other lines: the request id decides, as the unique index does on the server.
     const retry = await api.placeOrder([{ productId: 'p-0380', qty: 2 }], requestId);
     expect(retry).toBe(first);
     expect(await api.listOrders()).toEqual([first]);
 
-    const next = await api.placeOrder([{ productId: 'p-0952', qty: 1 }], newRequestId());
+    const next = await api.placeOrder([{ productId: 'p-0296', qty: 1 }], newRequestId());
     expect(next.id).not.toBe(first.id);
     expect(await api.listOrders()).toHaveLength(2);
   });
@@ -274,7 +274,7 @@ describe('createFakeOrdersApi', () => {
     const api = fake();
     const requestId = newRequestId();
     await rejection(api.placeOrder([{ productId: 'p-9999', qty: 1 }], requestId));
-    const order = await api.placeOrder([{ productId: 'p-0952', qty: 1 }], requestId);
-    expect(order.grossH).toBe(11500);
+    const order = await api.placeOrder([{ productId: 'p-0296', qty: 1 }], requestId);
+    expect(order.grossH).toBe(595000);
   });
 });

@@ -1,11 +1,11 @@
 /**
- * Cart rules (S-04, K-03, K-04, docs/CART_SPEC.md): quantities, totals, VAT and undo.
+ * Cart rules (S-04, K-03, K-04, docs/CART_SPEC.md): quantities, totals, TVA and undo.
  * Pure reducer tests: no React, no store, no timers.
  */
 import vectors from '../docs/fixtures/cart-vectors.json';
-import { splitVat, toHalalas, type Halalas } from '@/core/money';
+import { splitVat, toCentimes, type Centimes } from '@/core/money';
 import { mulberry32, randInt } from '@/core/rng';
-import { formatAmount, formatCount, formatSar } from '@/i18n/format';
+import { formatAmount, formatCount, formatDzd } from '@/i18n/format';
 import {
   EMPTY_CART,
   MAX_QTY,
@@ -33,7 +33,7 @@ function run(actions: readonly CartAction[], from: CartState = EMPTY_CART): Cart
 
 /** Builds a cart where line i is product `v-i` with the vector's price, and a matching price lookup. */
 function cartFromLines(lines: readonly VectorLine[]) {
-  const prices = new Map<string, Halalas>();
+  const prices = new Map<string, Centimes>();
   let state = EMPTY_CART;
   lines.forEach((line, i) => {
     const id = `v-${i}`;
@@ -43,7 +43,7 @@ function cartFromLines(lines: readonly VectorLine[]) {
   return { state, lookup: (id: string) => prices.get(id) };
 }
 
-describe('1. VAT vectors (docs/fixtures/cart-vectors.json)', () => {
+describe('1. TVA vectors (docs/fixtures/cart-vectors.json)', () => {
   const cases = (vectors as { cases: VectorCase[] }).cases;
 
   it('has the 8 agreed cases', () => {
@@ -56,16 +56,16 @@ describe('1. VAT vectors (docs/fixtures/cart-vectors.json)', () => {
   });
 });
 
-describe('2. VAT split property (10,000 seeded amounts)', () => {
-  it('net + vat === gross, and vat is gross × 3/23 rounded', () => {
+describe('2. TVA split property (10,000 seeded amounts)', () => {
+  it('net + vat === gross, and vat is gross × 19/119 rounded', () => {
     const rng = mulberry32(42);
     for (let i = 0; i < 10_000; i++) {
       const gross = randInt(rng, 0, 5_000_000);
       const { vat, net } = splitVat(gross);
       expect(Number.isInteger(vat)).toBe(true);
       expect(net + vat).toBe(gross);
-      // 6·gross + 23 is always odd, so an exact .5 never happens and Math.round agrees with the integer formula.
-      expect(vat).toBe(Math.round((gross * 3) / 23));
+      // 38·gross is even and 119 is odd, so an exact .5 never happens and Math.round agrees with the integer formula.
+      expect(vat).toBe(Math.round((gross * 19) / 119));
     }
   });
 });
@@ -306,30 +306,30 @@ describe('6. selectors', () => {
 });
 
 describe('7. float safety', () => {
-  it('converts SAR prices to exact integer halalas', () => {
-    expect(toHalalas(0.1 + 0.2)).toBe(30);
-    expect(toHalalas(49.95)).toBe(4995);
-    expect(toHalalas(19.99)).toBe(1999);
-    expect(toHalalas(1.005)).toBe(100); // 1.005 is 1.00499… in binary; documented, never used as a price.
+  it('converts DA prices to exact integer centimes', () => {
+    expect(toCentimes(0.1 + 0.2)).toBe(30);
+    expect(toCentimes(49.95)).toBe(4995);
+    expect(toCentimes(19.99)).toBe(1999);
+    expect(toCentimes(1.005)).toBe(100); // 1.005 is 1.00499… in binary; documented, never used as a price.
   });
 
-  it('three items at 0.10 SAR total exactly 0.30 SAR', () => {
-    const { state, lookup } = cartFromLines([{ priceH: toHalalas(0.1), qty: 3 }]);
+  it('three items at 0.10 DA total exactly 0.30 DA', () => {
+    const { state, lookup } = cartFromLines([{ priceH: toCentimes(0.1), qty: 3 }]);
     expect(selectTotals(state, lookup).gross).toBe(30);
   });
 });
 
-describe('8. formatSar', () => {
+describe('8. formatDzd', () => {
   it('formats English and Arabic with Western digits and two decimals', () => {
-    expect(formatSar(4995, 'en')).toBe('49.95 SAR');
-    expect(formatSar(4995, 'ar')).toBe('49.95 ر.س');
-    expect(formatSar(0, 'en')).toBe('0.00 SAR');
-    expect(formatSar(5, 'en')).toBe('0.05 SAR');
-    expect(formatSar(100, 'en')).toBe('1.00 SAR');
+    expect(formatDzd(4995, 'en')).toBe('49.95 DA');
+    expect(formatDzd(4995, 'ar')).toBe('49.95 د.ج');
+    expect(formatDzd(0, 'en')).toBe('0.00 DA');
+    expect(formatDzd(5, 'en')).toBe('0.05 DA');
+    expect(formatDzd(100, 'en')).toBe('1.00 DA');
   });
 
   it('groups thousands', () => {
-    expect(formatSar(1979901, 'en')).toBe('19,799.01 SAR');
+    expect(formatDzd(1979901, 'en')).toBe('19,799.01 DA');
     expect(formatAmount(100_000_000)).toBe('1,000,000.00');
     expect(formatAmount(99_999)).toBe('999.99');
   });
@@ -347,10 +347,10 @@ describe('8. formatSar', () => {
 
 describe('9. scale', () => {
   it('1,000 lines × 99 at the highest catalog price stays a safe integer', () => {
-    const lines = Array.from({ length: 1000 }, () => ({ priceH: 68_900, qty: 99 }));
+    const lines = Array.from({ length: 1000 }, () => ({ priceH: 2_480_000, qty: 99 }));
     const { state, lookup } = cartFromLines(lines);
     const totals = selectTotals(state, lookup);
-    expect(totals.gross).toBe(68_900 * 99 * 1000);
+    expect(totals.gross).toBe(2_480_000 * 99 * 1000);
     expect(Number.isSafeInteger(totals.gross)).toBe(true);
     expect(totals.net + totals.vat).toBe(totals.gross);
     expect(selectCount(state)).toBe(99_000);

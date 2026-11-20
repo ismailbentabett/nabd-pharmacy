@@ -21,7 +21,7 @@ import { orderNumber, type OrderStatus, type OrderSummary } from '@/core/api/ord
 import { Text } from '@/design/Text';
 import { makeStyles } from '@/design/theme';
 import { radius, size, space } from '@/design/tokens';
-import { formatSar, type Lang } from '@/i18n/format';
+import { formatDzd, type Lang } from '@/i18n/format';
 import type { MessageKey } from '@/i18n/strings';
 import { useT } from '@/i18n/useT';
 import { ORDERS_QUERY_KEY, ordersApi } from '@/state/orders';
@@ -60,7 +60,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
   const date = formatOrderDate(order.createdAt, lang);
   const status = t(STATUS_KEY[order.status]);
   const items = tn('orders.items', order.itemCount);
-  const total = formatSar(order.grossH, lang);
+  const total = formatDzd(order.grossH, lang);
   return (
     <View
       testID={testIds.orders.row(order.id)}

@@ -169,7 +169,7 @@ const useStyles = makeStyles((c) => ({
     justifyContent: 'space-between',
     columnGap: space.sm,
   },
-  // Mark and name at the reading start, "Deliver to Riyadh" at the reading end (flex row: mirrors in RTL).
+  // Mark and name at the reading start, "Deliver to Algiers" at the reading end (flex row: mirrors in RTL).
   brand: { flexDirection: 'row', alignItems: 'center', columnGap: space.xs },
   location: { flexDirection: 'row', alignItems: 'center', columnGap: space.xxs, flexShrink: 1 },
   shrink: { flexShrink: 1 },

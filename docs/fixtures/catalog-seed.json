@@ -5,14 +5,14 @@
   "total": 1000,
   "perCategory": 125,
   "categories": [
-    { "id": "vitamins", "en": "Vitamins", "ar": "الفيتامينات", "icon": "pill", "priceMin": 24.95, "priceMax": 189.0 },
-    { "id": "skincare", "en": "Skincare", "ar": "العناية بالبشرة", "icon": "sparkles", "priceMin": 29.0, "priceMax": 259.0 },
-    { "id": "baby-care", "en": "Baby care", "ar": "العناية بالطفل", "icon": "baby", "priceMin": 12.5, "priceMax": 149.0 },
-    { "id": "personal-care", "en": "Personal care", "ar": "العناية الشخصية", "icon": "bath", "priceMin": 8.95, "priceMax": 99.0 },
-    { "id": "medicines", "en": "Medicines", "ar": "الأدوية", "icon": "cross", "priceMin": 5.5, "priceMax": 79.0 },
-    { "id": "hair-care", "en": "Hair care", "ar": "العناية بالشعر", "icon": "scissors", "priceMin": 15.0, "priceMax": 139.0 },
-    { "id": "fitness", "en": "Fitness", "ar": "اللياقة البدنية", "icon": "dumbbell", "priceMin": 39.0, "priceMax": 349.0 },
-    { "id": "fragrance", "en": "Fragrance", "ar": "العطور", "icon": "flask-conical", "priceMin": 79.0, "priceMax": 689.0 }
+    { "id": "vitamins", "en": "Vitamins", "ar": "الفيتامينات", "icon": "pill", "priceMin": 900, "priceMax": 6800 },
+    { "id": "skincare", "en": "Skincare", "ar": "العناية بالبشرة", "icon": "sparkles", "priceMin": 1050, "priceMax": 9300 },
+    { "id": "baby-care", "en": "Baby care", "ar": "العناية بالطفل", "icon": "baby", "priceMin": 450, "priceMax": 5350 },
+    { "id": "personal-care", "en": "Personal care", "ar": "العناية الشخصية", "icon": "bath", "priceMin": 300, "priceMax": 3550 },
+    { "id": "medicines", "en": "Medicines", "ar": "الأدوية", "icon": "cross", "priceMin": 200, "priceMax": 2850 },
+    { "id": "hair-care", "en": "Hair care", "ar": "العناية بالشعر", "icon": "scissors", "priceMin": 550, "priceMax": 5000 },
+    { "id": "fitness", "en": "Fitness", "ar": "اللياقة البدنية", "icon": "dumbbell", "priceMin": 1400, "priceMax": 12550 },
+    { "id": "fragrance", "en": "Fragrance", "ar": "العطور", "icon": "flask-conical", "priceMin": 2850, "priceMax": 24800 }
   ],
   "brands": [
     { "en": "VitaWell", "ar": "فيتاويل", "for": ["vitamins", "fitness", "medicines"] },
@@ -104,6 +104,6 @@
     { "id": "b1", "en": { "title": "Summer skincare edit", "sub": "Up to 30% off SPF & hydration", "cta": "Shop skincare" }, "ar": { "title": "عناية الصيف بالبشرة", "sub": "خصم حتى 30٪ على واقيات الشمس والترطيب", "cta": "تسوّقي العناية بالبشرة" }, "category": "skincare", "tint": "primary" },
     { "id": "b2", "en": { "title": "Daily vitamins, simplified", "sub": "Bundle & save on bestsellers", "cta": "Shop vitamins" }, "ar": { "title": "فيتاميناتك اليومية بسهولة", "sub": "وفّر مع حزم الأكثر مبيعاً", "cta": "تسوّق الفيتامينات" }, "category": "vitamins", "tint": "secondary" },
     { "id": "b3", "en": { "title": "Mom & baby essentials", "sub": "Gentle care from day one", "cta": "Shop baby care" }, "ar": { "title": "أساسيات الأم والطفل", "sub": "عناية لطيفة من اليوم الأول", "cta": "تسوّق العناية بالطفل" }, "category": "baby-care", "tint": "primary" },
-    { "id": "b4", "en": { "title": "Free delivery over 100 SAR", "sub": "Pharmacy at your door", "cta": "Start shopping" }, "ar": { "title": "توصيل مجاني فوق 100 ر.س", "sub": "الصيدلية عند بابك", "cta": "ابدأ التسوق" }, "category": null, "tint": "secondary" }
+    { "id": "b4", "en": { "title": "Free delivery over 4,000 DA", "sub": "Pharmacy at your door", "cta": "Start shopping" }, "ar": { "title": "توصيل مجاني فوق 4,000 د.ج", "sub": "الصيدلية عند بابك", "cta": "ابدأ التسوق" }, "category": null, "tint": "secondary" }
   ]
 }

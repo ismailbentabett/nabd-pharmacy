@@ -23,30 +23,30 @@ select
   p.name,
   timestamptz '2026-03-01' + (p.n * interval '6 days 7 hours')
 from (values
-  (1,  'sara.alqahtani',   'Sara Al-Qahtani'),
-  (2,  'faisal.alharbi',   'Faisal Al-Harbi'),
-  (3,  'noura.alotaibi',   'Noura Al-Otaibi'),
-  (4,  'abdullah.alzahrani','Abdullah Al-Zahrani'),
-  (5,  'reem.alshehri',    'Reem Al-Shehri'),
-  (6,  'khalid.alghamdi',  'Khalid Al-Ghamdi'),
-  (7,  'lama.aldosari',    'Lama Al-Dosari'),
-  (8,  'omar.almutairi',   'Omar Al-Mutairi'),
-  (9,  'hessa.alanazi',    'Hessa Al-Anazi'),
-  (10, 'yousef.alsubaie',  'Yousef Al-Subaie'),
-  (11, 'maha.alshammari',  'Maha Al-Shammari'),
-  (12, 'turki.alrashid',   'Turki Al-Rashid'),
-  (13, 'dana.alamri',      'Dana Al-Amri'),
-  (14, 'saud.alqurashi',   'Saud Al-Qurashi'),
-  (15, 'jana.alhazmi',     'Jana Al-Hazmi'),
-  (16, 'majed.albalawi',   'Majed Al-Balawi'),
-  (17, 'ghada.aljuhani',   'Ghada Al-Juhani'),
-  (18, 'nasser.alyami',    'Nasser Al-Yami'),
-  (19, 'aisha.khan',       'Aisha Khan'),
-  (20, 'rahul.menon',      'Rahul Menon'),
-  (21, 'maria.santos',     'Maria Santos'),
-  (22, 'ahmed.hassan',     'Ahmed Hassan'),
-  (23, 'layla.mansour',    'Layla Mansour'),
-  (24, 'james.carter',     'James Carter')
+  (1,  'yacine.benali',       'Yacine Benali'),
+  (2,  'amina.bouzid',        'Amina Bouzid'),
+  (3,  'karim.haddad',        'Karim Haddad'),
+  (4,  'lina.meziane',        'Lina Meziane'),
+  (5,  'sofiane.cherif',      'Sofiane Cherif'),
+  (6,  'meriem.belkacem',     'Meriem Belkacem'),
+  (7,  'rayan.mansouri',      'Rayan Mansouri'),
+  (8,  'nourelhouda.saidi',   'Nour El Houda Saidi'),
+  (9,  'amine.boudiaf',       'Amine Boudiaf'),
+  (10, 'sarah.khelifi',       'Sarah Khelifi'),
+  (11, 'walid.aitahmed',      'Walid Ait Ahmed'),
+  (12, 'kenza.ouali',         'Kenza Ouali'),
+  (13, 'mehdi.larbi',         'Mehdi Larbi'),
+  (14, 'imane.hamidi',        'Imane Hamidi'),
+  (15, 'bilal.rahmani',       'Bilal Rahmani'),
+  (16, 'feriel.toumi',        'Feriel Toumi'),
+  (17, 'anis.brahimi',        'Anis Brahimi'),
+  (18, 'yasmine.amrani',      'Yasmine Amrani'),
+  (19, 'hamza.djebbar',       'Hamza Djebbar'),
+  (20, 'rania.ferhat',        'Rania Ferhat'),
+  (21, 'samir.ouchene',       'Samir Ouchene'),
+  (22, 'lydia.aitali',        'Lydia Ait Ali'),
+  (23, 'nadir.kaci',          'Nadir Kaci'),
+  (24, 'selma.benaissa',      'Selma Benaissa')
 ) as p (n, handle, name);
 
 -- auth.users: confirmed, no password (encrypted_password empty), so these accounts cannot log in.
@@ -115,11 +115,13 @@ cross join lateral (
   limit 1 + floor(random() * 5)::int
 ) as pr;
 
--- Totals use the app's VAT rule (src/core/money.ts): vat = floor((6 * gross + 23) / 46), net = gross - vat.
+-- Totals use the app's TVA rule (src/core/money.ts `splitVat`, 19 % included): money is integer centimes
+-- (1 DA = 100 centimes); vat = floor((38 * gross + 119) / 238), net = gross - vat. Computed in bigint
+-- because 38 * gross overflows integer on large orders.
 insert into public.orders (id, user_id, status, gross_h, vat_h, net_h, item_count, created_at)
 select o.id, o.user_id, o.status, t.gross,
-  floor((6 * t.gross + 23) / 46)::int,
-  t.gross - floor((6 * t.gross + 23) / 46)::int,
+  ((38 * t.gross::bigint + 119) / 238)::int,
+  t.gross - ((38 * t.gross::bigint + 119) / 238)::int,
   t.items, o.created_at
 from demo_orders o
 join (
