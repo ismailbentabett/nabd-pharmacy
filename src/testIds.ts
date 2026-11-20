@@ -30,6 +30,9 @@ export const testIds = {
   productGrid: 'product-grid',
   /** Grid tiles are numbered by position, so a flow can always tap "the first product". */
   productTile: (index: number) => `product-tile-${index}`,
+  /** The heart on a grid tile, numbered like the tile; and the one in the product header. */
+  favoriteTile: (index: number) => `favorite-tile-${index}`,
+  productFavorite: 'product-favorite',
   /** The Category screen's "Filter & sort" button and the states around its grid. */
   filterButton: 'filter-button',
   categoryState: {

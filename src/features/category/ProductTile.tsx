@@ -19,27 +19,28 @@
  * - A press while a product page is already opening or open does nothing (openProduct.ts): a
  *   double tap must not write a second hand-off or push a second page.
  */
-import { memo } from 'react';
-import { View, useWindowDimensions } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { memo } from "react";
+import { View, useWindowDimensions } from "react-native";
+import Animated from "react-native-reanimated";
 
-import { discountPercent, type Product } from '@/core/catalog';
-import { toHalalas } from '@/core/money';
-import { PressableScale } from '@/design/PressableScale';
-import { Text } from '@/design/Text';
-import { makeStyles } from '@/design/theme';
-import { layout, radius, size, space } from '@/design/tokens';
-import { MAX_FONT_SCALE, typeStyle, type Variant } from '@/design/typography';
-import { formatSar } from '@/i18n/format';
-import { useT } from '@/i18n/useT';
-import { isProductOpening } from '@/motion/hero/openProduct';
-import { useHeroSource } from '@/motion/hero/useHeroSource';
-import { testIds } from '@/testIds';
-import { DiscountTag } from '@/ui/DiscountTag';
-import { PriceBlock } from '@/ui/PriceBlock';
-import { ProductImage, productImageUri } from '@/ui/ProductImage';
-import { RatingInline, ratingInlineHeight } from '@/ui/RatingInline';
-import { Skeleton, SKELETON_MARK_RATIO } from '@/ui/Skeleton';
+import { discountPercent, type Product } from "@/core/catalog";
+import { toHalalas } from "@/core/money";
+import { PressableScale } from "@/design/PressableScale";
+import { Text } from "@/design/Text";
+import { makeStyles } from "@/design/theme";
+import { layout, radius, size, space } from "@/design/tokens";
+import { MAX_FONT_SCALE, typeStyle, type Variant } from "@/design/typography";
+import { formatSar } from "@/i18n/format";
+import { useT } from "@/i18n/useT";
+import { isProductOpening } from "@/motion/hero/openProduct";
+import { useHeroSource } from "@/motion/hero/useHeroSource";
+import { testIds } from "@/testIds";
+import { DiscountTag } from "@/ui/DiscountTag";
+import { HeartButton } from "@/ui/HeartButton";
+import { PriceBlock } from "@/ui/PriceBlock";
+import { ProductImage, productImageUri } from "@/ui/ProductImage";
+import { RatingInline, ratingInlineHeight } from "@/ui/RatingInline";
+import { Skeleton, SKELETON_MARK_RATIO } from "@/ui/Skeleton";
 
 /** Space between the tile's border and its content. */
 const TILE_PADDING = space.xs;
@@ -51,7 +52,12 @@ export function tileImageSize(tileWidth: number): number {
   return tileWidth - 2 * (TILE_PADDING + size.hairline);
 }
 
-type TileMetrics = Readonly<{ brand: number; name: number; rating: number; price: number }>;
+type TileMetrics = Readonly<{
+  brand: number;
+  name: number;
+  rating: number;
+  price: number;
+}>;
 
 /**
  * The heights the tile's text takes for the current language and system font (capped at the app's
@@ -63,8 +69,14 @@ function useTileMetrics(): TileMetrics {
   const { fontScale } = useWindowDimensions();
   const scale = Math.min(fontScale, MAX_FONT_SCALE);
   // Every type style sets a line height; `TextStyle` just types it as optional.
-  const line = (variant: Variant) => (typeStyle(lang, variant).lineHeight ?? 0) * scale;
-  return { brand: line('caption'), name: 2 * line('label'), rating: ratingInlineHeight(lang, scale), price: line('body') };
+  const line = (variant: Variant) =>
+    (typeStyle(lang, variant).lineHeight ?? 0) * scale;
+  return {
+    brand: line("caption"),
+    name: 2 * line("label"),
+    rating: ratingInlineHeight(lang, scale),
+    price: line("body"),
+  };
 }
 
 export type ProductTileProps = {
@@ -79,7 +91,7 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
   const styles = useStyles();
   const metrics = useTileMetrics();
   const { lang, t } = useT();
-  const ar = lang === 'ar';
+  const ar = lang === "ar";
   const name = ar ? product.nameAr : product.name;
   const discount = discountPercent(product);
   const imageSize = tileImageSize(width);
@@ -89,7 +101,10 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
   const now = formatSar(toHalalas(product.price), lang);
   const price =
     discount > 0 && product.oldPrice !== null
-      ? t('a11y.price', { price: now, old: formatSar(toHalalas(product.oldPrice), lang) })
+      ? t("a11y.price", {
+          price: now,
+          old: formatSar(toHalalas(product.oldPrice), lang),
+        })
       : now;
 
   const handlePress = () => {
@@ -105,7 +120,11 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
       testID={testIds.productTile(index)}
       style={styles.tile}
     >
-      <View style={styles.body} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <View
+        style={styles.body}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         <Animated.View ref={imageRef} style={[styles.imageBox, hiddenStyle]}>
           <ProductImage
             productId={product.id}
@@ -113,18 +132,42 @@ function ProductTileView({ product, index, width, onPress }: ProductTileProps) {
             placeholderColor={product.dominantColor}
             style={styles.image}
           />
-          {discount > 0 ? <DiscountTag percent={discount} style={styles.discount} /> : null}
+          {discount > 0 ? (
+            <DiscountTag percent={discount} style={styles.discount} />
+          ) : null}
         </Animated.View>
-        <Text variant="caption" tone="muted" numberOfLines={1} style={styles.brand}>
+        <Text
+          variant="caption"
+          tone="muted"
+          numberOfLines={1}
+          style={styles.brand}
+        >
           {ar ? product.brandAr : product.brand}
         </Text>
-        <Text variant="label" numberOfLines={2} style={{ minHeight: metrics.name }}>
+        <Text
+          variant="label"
+          numberOfLines={2}
+          style={{ minHeight: metrics.name }}
+        >
           {name}
         </Text>
         <View style={styles.footer}>
           <RatingInline rating={product.rating} reviews={product.reviews} />
-          <PriceBlock price={product.price} oldPrice={product.oldPrice} size="tile" />
+          <PriceBlock
+            price={product.price}
+            oldPrice={product.oldPrice}
+            size="tile"
+          />
         </View>
+      </View>
+      {/* Outside the hidden body so TalkBack can reach it, and outside the picture box so the hero
+          transition never hides it. It subscribes to its own id, so a toggle re-renders the heart only. */}
+      <View style={styles.heart} pointerEvents="box-none">
+        <HeartButton
+          productId={product.id}
+          name={name}
+          testID={testIds.favoriteTile(index)}
+        />
       </View>
     </PressableScale>
   );
@@ -142,7 +185,11 @@ export function ProductTileSkeleton({ width }: { width: number }) {
   const image = tileImageSize(width);
   return (
     <View style={[styles.tile, styles.skeletonTile, { width }]}>
-      <Skeleton width={image} height={image} markSize={Math.round(image * SKELETON_MARK_RATIO)} />
+      <Skeleton
+        width={image}
+        height={image}
+        markSize={Math.round(image * SKELETON_MARK_RATIO)}
+      />
       <View style={[styles.brand, styles.lines, { height: metrics.brand }]}>
         <Skeleton width="45%" height={SKELETON_BAR} radius={radius.pill} />
       </View>
@@ -163,6 +210,8 @@ export function ProductTileSkeleton({ width }: { width: number }) {
 }
 
 const useStyles = makeStyles((c) => ({
+  // The heart's 48 dp touch box sits in the picture's top-end corner; its drawn disc is smaller.
+  heart: { position: "absolute", top: TILE_PADDING, end: TILE_PADDING },
   tile: {
     // flexGrow: FlashList gives every cell in a row the height of the tallest one; the tile fills it.
     flexGrow: 1,
@@ -175,13 +224,13 @@ const useStyles = makeStyles((c) => ({
     backgroundColor: c.bgSurface,
   },
   body: { flexGrow: 1 },
-  imageBox: { width: '100%', aspectRatio: 1 },
-  image: { width: '100%', height: '100%' },
-  discount: { position: 'absolute', top: space.xs, start: space.xs },
+  imageBox: { width: "100%", aspectRatio: 1 },
+  image: { width: "100%", height: "100%" },
+  discount: { position: "absolute", top: space.xs, start: space.xs },
   brand: { marginTop: space.xs },
   // marginTop auto pins rating and price to the bottom, so prices line up across a row.
-  footer: { marginTop: 'auto', paddingTop: space.xxs, rowGap: space.hair },
+  footer: { marginTop: "auto", paddingTop: space.xxs, rowGap: space.hair },
   skeletonTile: { flexGrow: 0 },
   // Skeleton only: text bars sit in the middle of the height the real text takes.
-  lines: { justifyContent: 'space-evenly' },
+  lines: { justifyContent: "space-evenly" },
 }));

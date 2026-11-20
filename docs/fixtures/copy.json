@@ -85,7 +85,8 @@
     "a11y.page": "Image {i} of {n}",
     "a11y.gallery": "Product images",
     "a11y.rating": "Rated {r} out of 5",
-    "a11y.addedToCart": "{name} added to cart"
+    "a11y.addedToCart": "{name} added to cart",
+    "a11y.favorite": "Save {name} to favourites"
   },
   "ar": {
     "app.name": "نبض",
@@ -172,7 +173,8 @@
     "a11y.page": "الصورة {i} من {n}",
     "a11y.gallery": "صور المنتج",
     "a11y.rating": "التقييم {r} من 5",
-    "a11y.addedToCart": "تمت إضافة {name} إلى السلة"
+    "a11y.addedToCart": "تمت إضافة {name} إلى السلة",
+    "a11y.favorite": "حفظ {name} في المفضلة"
   },
   "plurals": {
     "_": "CLDR plural categories. English: one / other. Arabic: zero (0) / one (1) / two (2) / few (n % 100 in 3-10) / many (n % 100 in 11-99) / other. An optional English 'zero' form overrides 'other' for 0. {n} is formatted with Western digits and thousands separators.",
