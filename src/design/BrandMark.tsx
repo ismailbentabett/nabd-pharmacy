@@ -1,6 +1,6 @@
 /**
  * The Nabd mark: a lime disc with a pulse line (one heartbeat) cut through it. "Nabd" (نبض) is
- * Arabic for "pulse". Same geometry as the launcher icon, which `scripts/brand/make-icons.py` draws
+ * Arabic for "pulse". Same geometry as the launcher icon, which `scripts/brand/make-icons.mjs` draws
  * from these numbers (100-unit box): disc radius 40 centred at (50, 50), pulse stroke 7 with round
  * caps and joins, through the points in `PULSE` below.
  *
