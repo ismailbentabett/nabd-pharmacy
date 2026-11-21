@@ -13,7 +13,6 @@ npm-debug.*
 *.p12
 *.key
 *.mobileprovision
-.env*
 !.env.example
 # supabase local state
 supabase/.temp/
@@ -33,3 +32,4 @@ expo-env.d.ts
 coverage/
 # browser test output (local only)
 .playwright-mcp/
+config.bat
