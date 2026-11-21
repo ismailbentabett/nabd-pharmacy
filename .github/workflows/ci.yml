@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # React Native 0.88 and Expo SDK 58 require Node ^22.13.0 || ^24.3.0, so Node 20 is not used.
       - uses: actions/setup-node@v4
